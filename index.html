@@ -3,703 +3,969 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CTR Aftermarket Website 고객 문의 누적 보고서</title>
+<title>CTR Aftermarket Website 고객 문의 보고서</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
-:root {
-  --bg: #f8fafc; --card: #ffffff; --text: #0f172a; --sub: #64748b;
-  --border: #e2e8f0; --accent: #e42526; --accent2: #16a34a;
-  --hover: #f1f5f9; --shadow: rgba(0,0,0,0.08);
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f8fafc;--card:#fff;--text:#0f172a;--sub:#64748b;--border:#e2e8f0;
+  --accent:#e42526;--accent2:#1e40af;
+  --na:#2563EB;--latam:#DC2626;--eu:#EA580C;--sea:#16A34A;
+  --af:#7C3AED;--cis:#0891B2;--ru:#65A30D;--etc:#6B7280;
 }
-[data-theme="dark"] {
-  --bg: #0f172a; --card: #1e293b; --text: #e2e8f0; --sub: #94a3b8;
-  --border: #334155; --hover: #334155; --shadow: rgba(0,0,0,0.3);
+.dark{
+  --bg:#0f172a;--card:#1e293b;--text:#e2e8f0;--sub:#94a3b8;--border:#334155;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); transition: background 0.3s, color 0.3s; }
-a { color: inherit; }
-.container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;transition:background .3s,color .3s}
+.container{max-width:1400px;margin:0 auto;padding:20px}
 
-/* HEADER */
-.header { background: var(--card); border-bottom: 2px solid var(--accent); padding: 20px 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px var(--shadow); }
-.header-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-.header-title h1 { font-size: 1.3rem; font-weight: 700; color: var(--accent); }
-.header-title p { font-size: 0.78rem; color: var(--sub); margin-top: 2px; }
-.header-actions { display: flex; gap: 8px; }
-.btn { padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--text); cursor: pointer; font-size: 0.82rem; transition: all 0.2s; }
-.btn:hover { background: var(--hover); }
-.btn-accent { background: var(--accent); color: white; border-color: var(--accent); }
-.btn-accent:hover { opacity: 0.9; }
+/* Header */
+.header{background:var(--card);border-radius:12px;padding:24px 28px;margin-bottom:20px;border:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.header-left h1{font-size:1.5rem;font-weight:700;color:var(--accent)}
+.header-left p{color:var(--sub);font-size:.875rem;margin-top:4px}
+.header-right{display:flex;gap:10px;align-items:center}
+.btn{padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:.8rem;transition:all .2s}
+.btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-print{background:var(--accent2);color:#fff;border-color:var(--accent2)}
 
-/* MONTH NAV */
-.month-nav { background: var(--card); border-bottom: 1px solid var(--border); padding: 12px 0; }
-.year-tabs { display: flex; gap: 6px; margin-bottom: 10px; }
-.year-tab { padding: 5px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg); color: var(--sub); cursor: pointer; font-size: 0.82rem; font-weight: 600; transition: all 0.2s; }
-.year-tab.active { background: #1e293b; color: white; border-color: #1e293b; }
-[data-theme="dark"] .year-tab.active { background: #e2e8f0; color: #0f172a; }
-.month-btns { display: flex; gap: 6px; flex-wrap: wrap; }
-.month-btn { padding: 5px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg); color: var(--sub); cursor: pointer; font-size: 0.82rem; transition: all 0.2s; }
-.month-btn:hover { border-color: var(--accent); color: var(--accent); }
-.month-btn.active { background: var(--accent); color: white; border-color: var(--accent); font-weight: 600; }
+/* Navigator */
+.nav-section{background:var(--card);border-radius:12px;padding:16px 20px;margin-bottom:20px;border:1px solid var(--border)}
+.year-tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.year-tab{padding:6px 16px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--sub);cursor:pointer;font-size:.875rem;transition:all .2s}
+.year-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.month-btns{display:flex;gap:8px;flex-wrap:wrap}
+.month-btn{padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--sub);cursor:pointer;font-size:.8rem;transition:all .2s}
+.month-btn:hover{border-color:var(--accent);color:var(--accent)}
+.month-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 
-/* MAIN SECTIONS */
-.section { padding: 24px 0; border-bottom: 1px solid var(--border); }
-.section-title { font-size: 1rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-.section-title span { color: var(--accent); }
+/* Summary Grid */
+.summary-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}
+@media(max-width:900px){.summary-grid{grid-template-columns:1fr}}
 
-/* SUMMARY GRID */
-.summary-grid { display: grid; grid-template-columns: 280px 1fr 300px; gap: 16px; align-items: start; }
-.kpi-col { display: flex; flex-direction: column; gap: 12px; }
-.kpi-card { background: var(--card); border-radius: 12px; padding: 16px; border: 1px solid var(--border); box-shadow: 0 2px 8px var(--shadow); }
-.kpi-card .label { font-size: 0.75rem; color: var(--sub); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-.kpi-card .value { font-size: 2.2rem; font-weight: 800; margin-top: 4px; }
-.kpi-card.accent .value { color: var(--accent); }
-.kpi-card.green .value { color: var(--accent2); }
+/* KPI Cards */
+.kpi-stack{display:flex;flex-direction:column;gap:12px}
+.kpi-card{background:var(--card);border-radius:12px;padding:20px;border:1px solid var(--border)}
+.kpi-label{font-size:.8rem;color:var(--sub);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+.kpi-value{font-size:2.2rem;font-weight:700;line-height:1}
+.kpi-sub{font-size:.8rem;color:var(--sub);margin-top:6px}
 
-/* TYPE CARD */
-.type-card { background: var(--card); border-radius: 12px; padding: 16px; border: 1px solid var(--border); box-shadow: 0 2px 8px var(--shadow); }
-.type-card .tc-label { font-size: 0.75rem; color: var(--sub); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
-.type-row { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
-.type-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-.type-name { font-size: 0.75rem; width: 62px; flex-shrink: 0; color: var(--sub); }
-.type-bar-wrap { flex: 1; background: var(--border); border-radius: 4px; height: 7px; overflow: hidden; }
-.type-bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
-.type-count { font-size: 0.72rem; color: var(--text); font-weight: 600; width: 28px; text-align: right; flex-shrink: 0; }
+/* Type bars */
+.type-card{background:var(--card);border-radius:12px;padding:20px;border:1px solid var(--border)}
+.type-row{margin-bottom:10px}
+.type-header{display:flex;justify-content:space-between;margin-bottom:4px;font-size:.8rem}
+.type-bar-bg{background:var(--border);border-radius:4px;height:8px;overflow:hidden}
+.type-bar-fill{height:100%;border-radius:4px;transition:width .5s}
 
-/* CHART CARDS */
-.chart-card { background: var(--card); border-radius: 12px; padding: 16px; border: 1px solid var(--border); box-shadow: 0 2px 8px var(--shadow); }
-.chart-card canvas { max-height: 280px; }
-.chart-card .chart-title { font-size: 0.82rem; font-weight: 600; color: var(--sub); margin-bottom: 12px; }
+/* Chart containers */
+.chart-card{background:var(--card);border-radius:12px;padding:20px;border:1px solid var(--border);position:relative}
+.chart-title{font-size:.875rem;font-weight:600;margin-bottom:14px;color:var(--sub)}
 
-/* TREND */
-.trend-card { background: var(--card); border-radius: 12px; padding: 20px; border: 1px solid var(--border); box-shadow: 0 2px 8px var(--shadow); }
+/* Trend section */
+.trend-section{background:var(--card);border-radius:12px;padding:20px;border:1px solid var(--border);margin-bottom:20px}
+.section-title{font-size:1rem;font-weight:600;margin-bottom:16px}
 
-/* REGION GRID */
-.region-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; }
-.region-card { background: var(--card); border-radius: 12px; padding: 14px 10px; border: 2px solid var(--border); cursor: pointer; transition: all 0.2s; text-align: center; box-shadow: 0 2px 6px var(--shadow); }
-.region-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px var(--shadow); }
-.region-card.active { transform: translateY(-3px); box-shadow: 0 6px 16px var(--shadow); }
-.region-card.dimmed { opacity: 0.38; }
-.region-card .rc-name { font-size: 0.72rem; font-weight: 600; color: var(--sub); margin-bottom: 4px; }
-.region-card .rc-count { font-size: 1.5rem; font-weight: 800; }
-.region-card .rc-nl { font-size: 0.65rem; color: var(--sub); margin-top: 2px; }
+/* Region KPI Grid */
+.region-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+@media(max-width:900px){.region-grid{grid-template-columns:repeat(2,1fr)}}
+.region-kpi{background:var(--card);border-radius:12px;padding:14px;border:1px solid var(--border);cursor:pointer;transition:all .2s;border-top:3px solid var(--border)}
+.region-kpi:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.region-kpi.selected{box-shadow:0 0 0 2px var(--accent)}
+.region-kpi .r-name{font-size:.75rem;color:var(--sub);margin-bottom:4px}
+.region-kpi .r-val{font-size:1.6rem;font-weight:700}
+.region-kpi .r-nl{font-size:.75rem;color:var(--sub);margin-top:4px}
 
-/* TABS */
-.tabs-header { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 16px; border-bottom: 2px solid var(--border); padding-bottom: 0; }
-.tab-btn { padding: 8px 14px; border: none; background: none; color: var(--sub); cursor: pointer; font-size: 0.82rem; font-weight: 600; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
-.tab-btn:hover { color: var(--accent); }
-.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
-.tab-panel { display: none; }
-.tab-panel.active { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
-.email-card { background: var(--card); border-radius: 12px; padding: 14px; border: 1px solid var(--border); transition: all 0.2s; box-shadow: 0 2px 6px var(--shadow); }
-.email-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px var(--shadow); }
-.email-card .ec-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
-.badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 0.68rem; font-weight: 700; color: white; }
-.ec-name { font-weight: 700; font-size: 0.88rem; }
-.ec-meta { font-size: 0.72rem; color: var(--sub); margin-bottom: 4px; }
-.ec-summary { font-size: 0.78rem; color: var(--text); margin: 8px 0; padding: 8px; background: var(--bg); border-radius: 6px; line-height: 1.5; }
-.ec-action { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.68rem; font-weight: 600; background: #fef3c7; color: #92400e; }
-[data-theme="dark"] .ec-action { background: #422006; color: #fde68a; }
-.empty-state { text-align: center; padding: 32px; color: var(--sub); grid-column: 1 / -1; }
+/* Region Tabs */
+.region-tabs-section{background:var(--card);border-radius:12px;padding:20px;border:1px solid var(--border);margin-bottom:20px}
+.region-tab-buttons{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.region-tab-btn{padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--sub);cursor:pointer;font-size:.78rem;transition:all .2s}
+.region-tab-btn.active{color:#fff}
+.email-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.email-card{background:var(--bg);border-radius:8px;padding:14px;border:1px solid var(--border)}
+.email-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.country-badge{font-size:.7rem;padding:2px 8px;border-radius:4px;color:#fff;font-weight:600}
+.type-badge{font-size:.7rem;padding:2px 8px;border-radius:4px;font-weight:600}
+.email-name{font-weight:600;font-size:.875rem;margin-bottom:2px}
+.email-date{font-size:.75rem;color:var(--sub)}
+.email-summary{font-size:.8rem;color:var(--sub);margin-top:6px;line-height:1.4}
+.action-badge{display:inline-block;margin-top:8px;font-size:.7rem;padding:2px 8px;border-radius:4px;background:rgba(228,37,38,.1);color:var(--accent)}
 
-/* TABLE */
-.table-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
-.table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
-thead { background: var(--bg); }
-th { padding: 10px 12px; text-align: left; font-weight: 700; color: var(--sub); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid var(--border); white-space: nowrap; }
-td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-tr:last-child td { border-bottom: none; }
-tr:hover td { background: var(--hover); }
-.hidden-row { display: none; }
-.nl-badge-y { color: #16a34a; font-weight: 700; }
-.nl-badge-n { color: #dc2626; font-weight: 700; }
-.nl-badge-blank { color: var(--sub); }
+/* Table */
+.table-section{background:var(--card);border-radius:12px;padding:20px;border:1px solid var(--border);margin-bottom:20px;overflow-x:auto}
+.table-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.filter-info{font-size:.8rem;color:var(--sub)}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+th{padding:8px 10px;text-align:left;border-bottom:2px solid var(--border);color:var(--sub);font-weight:600;white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+tr:hover td{background:rgba(0,0,0,.02)}
+.dark tr:hover td{background:rgba(255,255,255,.03)}
 
-/* FOOTER */
-footer { padding: 24px 0; text-align: center; color: var(--sub); font-size: 0.78rem; }
+/* Footer */
+footer{text-align:center;padding:20px;color:var(--sub);font-size:.8rem}
 
-/* PRINT */
-@media print {
-  .header, .month-nav, .header-actions { position: static !important; }
-  .btn { display: none; }
-  .hidden-row { display: table-row !important; }
-  body { background: white; color: black; }
-}
+/* Print */
+@media print{.btn,.nav-section,.region-tab-buttons{display:none}body{background:#fff}.container{max-width:100%}}
 
-/* RESPONSIVE */
-@media (max-width: 1100px) {
-  .summary-grid { grid-template-columns: 1fr 1fr; }
-  .kpi-col { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; }
-  .kpi-col .kpi-card { flex: 1; min-width: 140px; }
-  .kpi-col .type-card { flex: 1; min-width: 100%; }
-}
-@media (max-width: 768px) {
-  .summary-grid { grid-template-columns: 1fr; }
-  .region-grid { grid-template-columns: repeat(4, 1fr); }
-  .header-title h1 { font-size: 1rem; }
-}
+/* Scrollbar */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 </style>
 </head>
-<body data-theme="light">
+<body>
+<div class="container">
+
+<!-- Header -->
+<div class="header">
+  <div class="header-left">
+    <h1>CTR Aftermarket Website — 고객 문의 보고서</h1>
+    <p>웹사이트 인바운드 문의 누적 집계 | 마지막 업데이트: 2026-04-20 08:45 (KST)</p>
+  </div>
+  <div class="header-right">
+    <button class="btn" onclick="toggleDark()">🌙 다크모드</button>
+    <button class="btn btn-print" onclick="window.print()">🖨️ 인쇄</button>
+  </div>
+</div>
+
+<!-- Navigator -->
+<div class="nav-section">
+  <div class="year-tabs" id="yearTabs"></div>
+  <div class="month-btns" id="monthBtns"></div>
+</div>
+
+<!-- Summary Grid -->
+<div class="summary-grid">
+  <!-- Left: KPI + Type -->
+  <div class="kpi-stack">
+    <div class="kpi-card">
+      <div class="kpi-label">총 문의 건수</div>
+      <div class="kpi-value" id="kpiTotal">—</div>
+      <div class="kpi-sub" id="kpiSub">—</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">뉴스레터 동의 (Y)</div>
+      <div class="kpi-value" id="kpiNL">—</div>
+      <div class="kpi-sub" id="kpiNLSub">—</div>
+    </div>
+    <div class="type-card" id="typeCard">
+      <div class="chart-title">문의 유형 분포</div>
+      <div id="typeBars"></div>
+    </div>
+  </div>
+
+  <!-- Middle: Region Bar Chart -->
+  <div class="chart-card">
+    <div class="chart-title">지역별 문의 건수 (클릭하여 필터)</div>
+    <canvas id="regionBarChart" height="280"></canvas>
+  </div>
+
+  <!-- Right: Donut -->
+  <div class="chart-card">
+    <div class="chart-title">뉴스레터 동의율</div>
+    <canvas id="nlDonut" height="280"></canvas>
+  </div>
+</div>
+
+<!-- Trend Section -->
+<div class="trend-section">
+  <div class="section-title">📈 연간 문의 추이</div>
+  <canvas id="trendChart" height="80"></canvas>
+</div>
+
+<!-- Region KPI Grid -->
+<div class="region-grid" id="regionGrid"></div>
+
+<!-- Region Tab Panel -->
+<div class="region-tabs-section">
+  <div class="section-title">지역별 문의 상세</div>
+  <div class="region-tab-buttons" id="regionTabBtns"></div>
+  <div class="email-cards" id="emailCards"></div>
+</div>
+
+<!-- Table -->
+<div class="table-section">
+  <div class="table-header">
+    <div class="section-title">📋 상세 데이터 테이블</div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span class="filter-info" id="filterInfo"></span>
+      <button class="btn" onclick="selectRegion('all')">필터 초기화</button>
+    </div>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>수신 일시</th>
+        <th>지역</th>
+        <th>국가</th>
+        <th>이름</th>
+        <th>이메일</th>
+        <th>전화번호</th>
+        <th>유형</th>
+        <th>NL</th>
+        <th>문의 요약</th>
+        <th>권고사항</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+</div>
+
+<footer>CTR Co., Ltd. Aftermarket Division · 자동 생성 보고서 · 2026-04-20 08:45 (KST)</footer>
+</div>
 
 <script>
 // __DATA_START__
 const ALL_MONTHLY_DATA = {
   "2026-04": {
-    label: "2026년 04월",
-    total: 13,
-    nlY: 9,
-    typeCounts: { parts: 2, purchase: 7, price: 0, technical: 0, complaint: 0, empty: 1, other: 3 },
-    regionCounts: { na: 3, latam: 1, eu: 1, sea: 0, af: 3, cis: 0, ru: 1, etc: 4 },
-    regionNL:       { na: 1, latam: 0, eu: 1, sea: 0, af: 2, cis: 0, ru: 1, etc: 4 },
-    regionNL_N:     { na: 1, latam: 1, eu: 0, sea: 0, af: 1, cis: 0, ru: 0, etc: 0 },
-    regionNL_Blank: { na: 1, latam: 0, eu: 0, sea: 0, af: 0, cis: 0, ru: 0, etc: 0 },
-    regionTypeCounts: {
-      na:    { parts: 0, purchase: 3, price: 0, technical: 0, complaint: 0, empty: 0, other: 0 },
-      latam: { parts: 0, purchase: 1, price: 0, technical: 0, complaint: 0, empty: 0, other: 0 },
-      eu:    { parts: 0, purchase: 0, price: 0, technical: 0, complaint: 0, empty: 0, other: 1 },
-      sea:   { parts: 0, purchase: 0, price: 0, technical: 0, complaint: 0, empty: 0, other: 0 },
-      af:    { parts: 0, purchase: 1, price: 0, technical: 0, complaint: 0, empty: 1, other: 1 },
-      cis:   { parts: 0, purchase: 0, price: 0, technical: 0, complaint: 0, empty: 0, other: 0 },
-      ru:    { parts: 1, purchase: 0, price: 0, technical: 0, complaint: 0, empty: 0, other: 0 },
-      etc:   { parts: 1, purchase: 2, price: 0, technical: 0, complaint: 0, empty: 0, other: 1 }
+    "label": "2026년 04월",
+    "total": 21,
+    "nlY": 17,
+    "typeCounts": {
+      "parts": 4,
+      "purchase": 9,
+      "price": 1,
+      "technical": 0,
+      "complaint": 0,
+      "empty": 3,
+      "other": 4
     },
-    emails: [
-      { datetime: "2026-04-16 18:16 (KST)", region: "af", country: "United Arab Emirates", name: "TWO STEP", email: "twostep859@gmail.com", phone: "0562055521", type: "empty", newsletter: "Y", summary: "VEHCLE PARTS 문의 - 본문 내용이 'NEED PARTS'로 구체적 정보 없음", action: "내용 확인 후 회신 필요 / 마케팅 DB 추가 필요" },
-      { datetime: "2026-04-16 16:54 (KST)", region: "ru", country: "Russian Federation", name: "Юрий", email: "ovdei71@yandex.ru", phone: "+79306808493", type: "parts", newsletter: "Y", summary: "Chery Tiggo 8 Pro Max 2.0 4WD 2022(VIN LVTDD24B5ND347108) 전/후방 스태빌라이저 링크 하이브리드 부품번호 문의 (PL0579/CL0579, 후방 CL0049 하이브리드 여부)", action: "제품 정보 안내 필요 / 마케팅 DB 추가 필요" },
-      { datetime: "2026-04-15 23:29 (KST)", region: "na", country: "United States", name: "DENZEL", email: "denzelhayes96@gmail.com", phone: "8327632637", type: "purchase", newsletter: "Y", summary: "tie rods 등 부품 주문 방법 문의", action: "영업팀 연락 필요 / 마케팅 DB 추가 필요" },
-      { datetime: "2026-04-13 21:32 (KST)", region: "etc", country: "Korea, Republic of", name: "ED", email: "mund2@op.pl", phone: "598771062", type: "parts", newsletter: "Y", summary: "Kia Xceed에 CTR GV0322(후방 로어컨트롤암 부싱, OE 55230F2AA) 적합 여부 문의", action: "제품 정보 안내 필요 / 마케팅 DB 추가 필요" },
-      { datetime: "2026-04-09 18:34 (KST)", region: "etc", country: "Korea, Republic of", name: "Cadeto Vicente Come", email: "cadetocome@mozcontinental.co.mz", phone: "+258840495072", type: "purchase", newsletter: "Y", summary: "모잠비크 자동차부품 판매사 - CTR 서스펜션·스티어링 공급처 및 포트폴리오 요청", action: "영업팀 연락 필요 / 마케팅 DB 추가 필요" },
-      { datetime: "2026-04-09 17:32 (KST)", region: "eu", country: "Poland", name: "Dorota Neumann-Mueller", email: "dorota.neumann-muller@logisticsplus.com", phone: "0048798492336", type: "other", newsletter: "Y", summary: "Logistics Plus Poland의 물류 협력 파트너십 제안(폴란드어)", action: "담당자 검토 필요 / 마케팅 DB 추가 필요" },
-      { datetime: "2026-04-09 15:36 (KST)", region: "af", country: "Israel", name: "Erez Maman", email: "erezmaman7@gmail.com", phone: "+972506708963", type: "purchase", newsletter: "N", summary: "이스라엘 내 CTR 유통업체/현지 대리점 정보 문의, 없으면 직접 구매 희망", action: "영업팀 연락 필요" },
-      { datetime: "2026-04-07 14:57 (KST)", region: "etc", country: "Korea, Republic of", name: "Irene (GJBUSH)", email: "sales03@gjbush.com", phone: "13617914001", type: "other", newsletter: "Y", summary: "GJBUSH 고무 부품 제조사의 CTR 향 고무 부싱 납품 협력 제안", action: "담당자 검토 필요 / 마케팅 DB 추가 필요" },
-      { datetime: "2026-04-06 13:00 (KST)", region: "etc", country: "Korea, Republic of", name: "조용운", email: "mcho@kebsrl.com", phone: "+59163442013", type: "purchase", newsletter: "Y", summary: "볼리비아 자동차부품 유통업체 대표(4/9까지 방한 중) CTR 영업팀 미팅 주선 요청", action: "영업팀 연락 필요 / 마케팅 DB 추가 필요" },
-      { datetime: "2026-04-03 03:22 (KST)", region: "na", country: "United States", name: "Mitch", email: "mccuculis@outlook.com", phone: "7174289138", type: "purchase", newsletter: "미표기", summary: "CQ0465L·CQ0465R 부품 미국 내 리테일러 구매처 문의", action: "영업팀 연락 필요" },
-      { datetime: "2026-04-03 03:21 (KST)", region: "na", country: "United States", name: "Mitch", email: "mccuculis@outlook.com", phone: "7174289138", type: "purchase", newsletter: "N", summary: "CQ0465L·CQ0465R 부품 미국 내 리테일러 구매처 문의 (중복 발송)", action: "영업팀 연락 필요" },
-      { datetime: "2026-04-02 20:33 (KST)", region: "af", country: "South Africa", name: "Ethan Mayer", email: "ethan@autoindustrialafrica.com", phone: "+27115680710", type: "other", newsletter: "Y", summary: "Auto Industrial Review Africa 잡지 2026년판 광고 게재 및 마케팅 패키지 제안", action: "담당자 검토 필요 / 마케팅 DB 추가 필요" },
-      { datetime: "2026-04-02 00:40 (KST)", region: "latam", country: "Mexico", name: "Antonio Vazquez", email: "antoniovg93@hotmail.fr", phone: "5551021984", type: "purchase", newsletter: "N", summary: "AAPEX(라스베이거스) 박람회 후속 연락 - 멕시코 도매업체로 CTR 제품 구매 희망", action: "영업팀 연락 필요" }
+    "regionCounts": {
+      "na": 5,
+      "latam": 2,
+      "eu": 1,
+      "sea": 0,
+      "af": 3,
+      "cis": 5,
+      "ru": 1,
+      "etc": 4
+    },
+    "regionNL": {
+      "na": 3,
+      "latam": 1,
+      "eu": 1,
+      "sea": 0,
+      "af": 2,
+      "cis": 5,
+      "ru": 1,
+      "etc": 4
+    },
+    "regionNL_N": {
+      "na": 1,
+      "latam": 1,
+      "eu": 0,
+      "sea": 0,
+      "af": 1,
+      "cis": 0,
+      "ru": 0,
+      "etc": 0
+    },
+    "regionNL_Blank": {
+      "na": 1,
+      "latam": 0,
+      "eu": 0,
+      "sea": 0,
+      "af": 0,
+      "cis": 0,
+      "ru": 0,
+      "etc": 0
+    },
+    "regionTypeCounts": {
+      "na": {
+        "parts": 2,
+        "purchase": 3,
+        "price": 0,
+        "technical": 0,
+        "complaint": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "latam": {
+        "parts": 0,
+        "purchase": 1,
+        "price": 1,
+        "technical": 0,
+        "complaint": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "eu": {
+        "parts": 0,
+        "purchase": 0,
+        "price": 0,
+        "technical": 0,
+        "complaint": 0,
+        "empty": 0,
+        "other": 1
+      },
+      "sea": {
+        "parts": 0,
+        "purchase": 0,
+        "price": 0,
+        "technical": 0,
+        "complaint": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "af": {
+        "parts": 0,
+        "purchase": 1,
+        "price": 0,
+        "technical": 0,
+        "complaint": 0,
+        "empty": 1,
+        "other": 1
+      },
+      "cis": {
+        "parts": 0,
+        "purchase": 2,
+        "price": 0,
+        "technical": 0,
+        "complaint": 0,
+        "empty": 2,
+        "other": 1
+      },
+      "ru": {
+        "parts": 1,
+        "purchase": 0,
+        "price": 0,
+        "technical": 0,
+        "complaint": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "etc": {
+        "parts": 1,
+        "purchase": 2,
+        "price": 0,
+        "technical": 0,
+        "complaint": 0,
+        "empty": 0,
+        "other": 1
+      }
+    },
+    "emails": [
+      {
+        "datetime": "2026-04-19 17:18 (KST)",
+        "region": "cis",
+        "country": "Kyrgyzstan",
+        "name": "Irbis",
+        "email": "itikulov.irbis@yandex.com",
+        "phone": "+996700135740",
+        "type": "purchase",
+        "newsletter": "Y",
+        "summary": "협력 의사 표명, WhatsApp 연락 요청",
+        "action": "영업팀 연락 필요"
+      },
+      {
+        "datetime": "2026-04-19 17:18 (KST)",
+        "region": "cis",
+        "country": "Kyrgyzstan",
+        "name": "Irbis",
+        "email": "itikulov.irbis@yandex.com",
+        "phone": "+996700135740",
+        "type": "purchase",
+        "newsletter": "Y",
+        "summary": "협력 의사 표명, WhatsApp 연락 요청",
+        "action": "영업팀 연락 필요"
+      },
+      {
+        "datetime": "2026-04-19 17:09 (KST)",
+        "region": "cis",
+        "country": "Kyrgyzstan",
+        "name": "Yahyobek",
+        "email": "a70844002@gmail.com",
+        "phone": "+996990059090",
+        "type": "empty",
+        "newsletter": "Y",
+        "summary": "본문 내용 없음 (\"Привет\" 단순 인사만 기재)",
+        "action": "내용 확인 후 회신 필요"
+      },
+      {
+        "datetime": "2026-04-19 17:08 (KST)",
+        "region": "cis",
+        "country": "Kyrgyzstan",
+        "name": "Yahyobek",
+        "email": "a70844002@gmail.com",
+        "phone": "+996990059090",
+        "type": "empty",
+        "newsletter": "Y",
+        "summary": "[Claim] 선택했으나 본문 없음 (\"Привет\" 단순 인사)",
+        "action": "내용 확인 후 회신 필요"
+      },
+      {
+        "datetime": "2026-04-19 04:30 (KST)",
+        "region": "latam",
+        "country": "Ecuador",
+        "name": "Angel Valarezo Ruiz",
+        "email": "angelvalarezo@yahoo.com",
+        "phone": "593 984810508",
+        "type": "price",
+        "newsletter": "Y",
+        "summary": "CTR 브레이크 패드 수입 관심, 카탈로그 및 가격 정보 요청",
+        "action": "견적서 발송 필요"
+      },
+      {
+        "datetime": "2026-04-18 12:12 (KST)",
+        "region": "na",
+        "country": "Canada",
+        "name": "Daljeet",
+        "email": "msdaljeet@yahoo.co.in",
+        "phone": "6047497009",
+        "type": "parts",
+        "newsletter": "Y",
+        "summary": "부품 목록 상세 정보 요청",
+        "action": "제품 정보 안내 필요"
+      },
+      {
+        "datetime": "2026-04-18 12:12 (KST)",
+        "region": "na",
+        "country": "Canada",
+        "name": "Daljeet",
+        "email": "msdaljeet@yahoo.co.in",
+        "phone": "6047497009",
+        "type": "parts",
+        "newsletter": "Y",
+        "summary": "부품 목록 상세 정보 요청",
+        "action": "제품 정보 안내 필요"
+      },
+      {
+        "datetime": "2026-04-17 19:26 (KST)",
+        "region": "cis",
+        "country": "Turkmenistan",
+        "name": "Astanow Azat",
+        "email": "0306nnbonus@gmail.com",
+        "phone": "+99365357946",
+        "type": "other",
+        "newsletter": "Y",
+        "summary": "중국 공장 연락처 요청, 제품 관심 의사 표명",
+        "action": "담당자 검토 필요"
+      },
+      {
+        "datetime": "2026-04-16 18:16 (KST)",
+        "region": "af",
+        "country": "United Arab Emirates",
+        "name": "TWO STEP",
+        "email": "twostep859@gmail.com",
+        "phone": "0562055521",
+        "type": "empty",
+        "newsletter": "Y",
+        "summary": "VEHCLE PARTS 문의 - 본문 내용이 'NEED PARTS'로 구체적 정보 없음",
+        "action": "내용 확인 후 회신 필요 / 마케팅 DB 추가 필요"
+      },
+      {
+        "datetime": "2026-04-16 16:54 (KST)",
+        "region": "ru",
+        "country": "Russian Federation",
+        "name": "Юрий",
+        "email": "ovdei71@yandex.ru",
+        "phone": "+79306808493",
+        "type": "parts",
+        "newsletter": "Y",
+        "summary": "Chery Tiggo 8 Pro Max 2.0 4WD 2022(VIN LVTDD24B5ND347108) 전/후방 스태빌라이저 링크 하이브리드 부품번호 문의 (PL0579/CL0579, 후방 CL0049 하이브리드 여부)",
+        "action": "제품 정보 안내 필요 / 마케팅 DB 추가 필요"
+      },
+      {
+        "datetime": "2026-04-15 23:29 (KST)",
+        "region": "na",
+        "country": "United States",
+        "name": "DENZEL",
+        "email": "denzelhayes96@gmail.com",
+        "phone": "8327632637",
+        "type": "purchase",
+        "newsletter": "Y",
+        "summary": "tie rods 등 부품 주문 방법 문의",
+        "action": "영업팀 연락 필요 / 마케팅 DB 추가 필요"
+      },
+      {
+        "datetime": "2026-04-13 21:32 (KST)",
+        "region": "etc",
+        "country": "Korea, Republic of",
+        "name": "ED",
+        "email": "mund2@op.pl",
+        "phone": "598771062",
+        "type": "parts",
+        "newsletter": "Y",
+        "summary": "Kia Xceed에 CTR GV0322(후방 로어컨트롤암 부싱, OE 55230F2AA) 적합 여부 문의",
+        "action": "제품 정보 안내 필요 / 마케팅 DB 추가 필요"
+      },
+      {
+        "datetime": "2026-04-09 18:34 (KST)",
+        "region": "etc",
+        "country": "Korea, Republic of",
+        "name": "Cadeto Vicente Come",
+        "email": "cadetocome@mozcontinental.co.mz",
+        "phone": "+258840495072",
+        "type": "purchase",
+        "newsletter": "Y",
+        "summary": "모잠비크 자동차부품 판매사 - CTR 서스펜션·스티어링 공급처 및 포트폴리오 요청",
+        "action": "영업팀 연락 필요 / 마케팅 DB 추가 필요"
+      },
+      {
+        "datetime": "2026-04-09 17:32 (KST)",
+        "region": "eu",
+        "country": "Poland",
+        "name": "Dorota Neumann-Mueller",
+        "email": "dorota.neumann-muller@logisticsplus.com",
+        "phone": "0048798492336",
+        "type": "other",
+        "newsletter": "Y",
+        "summary": "Logistics Plus Poland의 물류 협력 파트너십 제안(폴란드어)",
+        "action": "담당자 검토 필요 / 마케팅 DB 추가 필요"
+      },
+      {
+        "datetime": "2026-04-09 15:36 (KST)",
+        "region": "af",
+        "country": "Israel",
+        "name": "Erez Maman",
+        "email": "erezmaman7@gmail.com",
+        "phone": "+972506708963",
+        "type": "purchase",
+        "newsletter": "N",
+        "summary": "이스라엘 내 CTR 유통업체/현지 대리점 정보 문의, 없으면 직접 구매 희망",
+        "action": "영업팀 연락 필요"
+      },
+      {
+        "datetime": "2026-04-07 14:57 (KST)",
+        "region": "etc",
+        "country": "Korea, Republic of",
+        "name": "Irene (GJBUSH)",
+        "email": "sales03@gjbush.com",
+        "phone": "13617914001",
+        "type": "other",
+        "newsletter": "Y",
+        "summary": "GJBUSH 고무 부품 제조사의 CTR 향 고무 부싱 납품 협력 제안",
+        "action": "담당자 검토 필요 / 마케팅 DB 추가 필요"
+      },
+      {
+        "datetime": "2026-04-06 13:00 (KST)",
+        "region": "etc",
+        "country": "Korea, Republic of",
+        "name": "조용운",
+        "email": "mcho@kebsrl.com",
+        "phone": "+59163442013",
+        "type": "purchase",
+        "newsletter": "Y",
+        "summary": "볼리비아 자동차부품 유통업체 대표(4/9까지 방한 중) CTR 영업팀 미팅 주선 요청",
+        "action": "영업팀 연락 필요 / 마케팅 DB 추가 필요"
+      },
+      {
+        "datetime": "2026-04-03 03:22 (KST)",
+        "region": "na",
+        "country": "United States",
+        "name": "Mitch",
+        "email": "mccuculis@outlook.com",
+        "phone": "7174289138",
+        "type": "purchase",
+        "newsletter": "미표기",
+        "summary": "CQ0465L·CQ0465R 부품 미국 내 리테일러 구매처 문의",
+        "action": "영업팀 연락 필요"
+      },
+      {
+        "datetime": "2026-04-03 03:21 (KST)",
+        "region": "na",
+        "country": "United States",
+        "name": "Mitch",
+        "email": "mccuculis@outlook.com",
+        "phone": "7174289138",
+        "type": "purchase",
+        "newsletter": "N",
+        "summary": "CQ0465L·CQ0465R 부품 미국 내 리테일러 구매처 문의 (중복 발송)",
+        "action": "영업팀 연락 필요"
+      },
+      {
+        "datetime": "2026-04-02 20:33 (KST)",
+        "region": "af",
+        "country": "South Africa",
+        "name": "Ethan Mayer",
+        "email": "ethan@autoindustrialafrica.com",
+        "phone": "+27115680710",
+        "type": "other",
+        "newsletter": "Y",
+        "summary": "Auto Industrial Review Africa 잡지 2026년판 광고 게재 및 마케팅 패키지 제안",
+        "action": "담당자 검토 필요 / 마케팅 DB 추가 필요"
+      },
+      {
+        "datetime": "2026-04-02 00:40 (KST)",
+        "region": "latam",
+        "country": "Mexico",
+        "name": "Antonio Vazquez",
+        "email": "antoniovg93@hotmail.fr",
+        "phone": "5551021984",
+        "type": "purchase",
+        "newsletter": "N",
+        "summary": "AAPEX(라스베이거스) 박람회 후속 연락 - 멕시코 도매업체로 CTR 제품 구매 희망",
+        "action": "영업팀 연락 필요"
+      }
     ]
   }
 };
 // __DATA_END__
 
-/* ── CONFIG ─────────────────────────────── */
-const REGION_CONFIG = {
-  na:    { name: "북미",   color: "#2563EB" },
-  latam: { name: "중남미", color: "#DC2626" },
-  eu:    { name: "유럽",   color: "#EA580C" },
-  sea:   { name: "동남아", color: "#16A34A" },
-  af:    { name: "아중동", color: "#7C3AED" },
-  cis:   { name: "CIS",   color: "#0891B2" },
-  ru:    { name: "러시아", color: "#65A30D" },
-  etc:   { name: "기타",   color: "#6B7280" }
+// ─── Constants ───────────────────────────────────────────────────
+const REGION_META = {
+  na:    {name:'북미',      color:'#2563EB'},
+  latam: {name:'중남미',    color:'#DC2626'},
+  eu:    {name:'유럽',      color:'#EA580C'},
+  sea:   {name:'동남아',    color:'#16A34A'},
+  af:    {name:'아중동',    color:'#7C3AED'},
+  cis:   {name:'CIS',      color:'#0891B2'},
+  ru:    {name:'러시아',    color:'#65A30D'},
+  etc:   {name:'기타',      color:'#6B7280'},
 };
-const TYPE_CONFIG = {
-  parts:     { name: "부품 정보",  color: "#0EA5E9" },
-  purchase:  { name: "구매/주문",  color: "#10B981" },
-  price:     { name: "가격/견적",  color: "#F59E0B" },
-  technical: { name: "기술 지원",  color: "#8B5CF6" },
-  complaint: { name: "불만/A·S",  color: "#EF4444" },
-  empty:     { name: "내용 없음",  color: "#9CA3AF" },
-  other:     { name: "기타",       color: "#6B7280" }
+const TYPE_META = {
+  parts:     {name:'부품 정보',  color:'#0EA5E9'},
+  purchase:  {name:'구매/주문',  color:'#10B981'},
+  price:     {name:'가격/견적',  color:'#F59E0B'},
+  technical: {name:'기술 지원',  color:'#8B5CF6'},
+  complaint: {name:'불만/A·S',  color:'#EF4444'},
+  empty:     {name:'내용 없음',  color:'#9CA3AF'},
+  other:     {name:'기타',       color:'#6B7280'},
 };
-const REGION_KEYS = Object.keys(REGION_CONFIG);
-const TYPE_KEYS   = Object.keys(TYPE_CONFIG);
+const NL_COLORS = {'Y':'#10B981','N':'#EF4444','미표기':'#94A3B8'};
+const MONTHS = ['01','02','03','04','05','06','07','08','09','10','11','12'];
 
-/* ── STATE ──────────────────────────────── */
-let currentMonth = '';
-let activeRegion = 'all';
-let barChart, donutChart, trendChart;
+let currentYM = '';
+let currentRegion = 'all';
+let regionChart = null, nlChart = null, trendChart = null;
 
-/* ── INIT ───────────────────────────────── */
-window.addEventListener('DOMContentLoaded', () => {
-  buildNav();
-  const months = Object.keys(ALL_MONTHLY_DATA).sort();
-  loadMonth(months[months.length - 1]);
-});
-
-/* ── NAV ────────────────────────────────── */
-function buildNav() {
-  const months = Object.keys(ALL_MONTHLY_DATA).sort();
-  const years  = [...new Set(months.map(m => m.slice(0,4)))];
-  const ytabs  = document.getElementById('year-tabs');
-  const mbtns  = document.getElementById('month-btns');
-  ytabs.innerHTML = years.map(y =>
-    `<button class="year-tab" onclick="selectYear('${y}')">${y}</button>`
-  ).join('');
-  window._buildMonthBtns = (year) => {
-    mbtns.innerHTML = months
-      .filter(m => m.startsWith(year))
-      .map(m => `<button class="month-btn" id="mbtn-${m}" onclick="loadMonth('${m}')">${+m.slice(5)}월</button>`)
-      .join('');
-  };
-  const latestYear = months[months.length-1].slice(0,4);
-  selectYear(latestYear);
+// ─── Init ────────────────────────────────────────────────────────
+function init() {
+  const keys = Object.keys(ALL_MONTHLY_DATA).sort();
+  currentYM = keys[keys.length - 1];
+  buildNav(keys);
+  loadMonth(currentYM);
 }
-function selectYear(year) {
-  document.querySelectorAll('.year-tab').forEach(t => {
-    t.classList.toggle('active', t.textContent === year);
+
+function buildNav(keys) {
+  const years = [...new Set(keys.map(k => k.slice(0,4)))];
+  const yearTabs = document.getElementById('yearTabs');
+  yearTabs.innerHTML = '';
+  years.forEach(y => {
+    const b = document.createElement('button');
+    b.className = 'year-tab' + (y === currentYM.slice(0,4) ? ' active' : '');
+    b.textContent = y + '년';
+    b.onclick = () => {
+      document.querySelectorAll('.year-tab').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      renderMonthBtns(y, keys);
+    };
+    yearTabs.appendChild(b);
   });
-  window._buildMonthBtns(year);
-  // activate the most recent month of this year
-  const months = Object.keys(ALL_MONTHLY_DATA).sort().filter(m => m.startsWith(year));
-  if (months.length) {
-    const target = months.includes(currentMonth) ? currentMonth : months[months.length-1];
-    loadMonth(target);
-  }
+  renderMonthBtns(currentYM.slice(0,4), keys);
 }
 
-/* ── LOAD MONTH ─────────────────────────── */
+function renderMonthBtns(year, keys) {
+  const mb = document.getElementById('monthBtns');
+  mb.innerHTML = '';
+  keys.filter(k=>k.startsWith(year)).forEach(ym => {
+    const b = document.createElement('button');
+    b.className = 'month-btn' + (ym === currentYM ? ' active' : '');
+    b.textContent = ym.slice(5) + '월';
+    b.onclick = () => loadMonth(ym);
+    mb.appendChild(b);
+  });
+}
+
 function loadMonth(ym) {
-  currentMonth = ym;
-  activeRegion = 'all';
-  const d = ALL_MONTHLY_DATA[ym];
-  // nav highlight
-  document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
-  const mb = document.getElementById('mbtn-' + ym);
-  if (mb) mb.classList.add('active');
-  // update kpi
-  document.getElementById('kpi-total').textContent = d.total + '건';
-  document.getElementById('kpi-nl').textContent    = d.nlY + '건';
-  // update bar chart
-  updateBarChart(d, null);
-  // update donut
-  updateDonutChart(d, 'all');
-  // update type bars
-  updateTypeBars(d.typeCounts);
-  // render region cards
-  renderRegionCards(d, 'all');
-  // render trend
+  currentYM = ym;
+  currentRegion = 'all';
+  document.querySelectorAll('.month-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent === ym.slice(5)+'월');
+  });
+  renderSummary();
+  renderRegionGrid();
+  renderRegionTabs();
+  renderTable();
   renderTrendChart(ym.slice(0,4));
-  // render tabs
-  renderTabs(d, 'all');
-  // render table
-  renderTable(d.emails);
-  // reset region UI
-  document.getElementById('resetBtn').style.display = 'none';
-  document.getElementById('tableCount').textContent = d.emails.length + '건';
 }
 
-/* ── REGION TOGGLE ──────────────────────── */
-function toggleRegion(region) {
-  selectRegion(activeRegion === region ? 'all' : region);
+// ─── Helpers ─────────────────────────────────────────────────────
+function getFilteredEmails() {
+  const d = ALL_MONTHLY_DATA[currentYM];
+  if (!d) return [];
+  if (currentRegion === 'all') return d.emails;
+  return d.emails.filter(e => e.region === currentRegion);
 }
-function selectRegion(region) {
-  activeRegion = region;
-  const d = ALL_MONTHLY_DATA[currentMonth];
-  // KPI
-  if (region === 'all') {
-    document.getElementById('kpi-total').textContent = d.total + '건';
-    document.getElementById('kpi-nl').textContent    = d.nlY + '건';
-    updateTypeBars(d.typeCounts);
-  } else {
-    const rc = d.regionCounts[region] || 0;
-    document.getElementById('kpi-total').textContent = rc + '건';
-    document.getElementById('kpi-nl').textContent    = (d.regionNL[region] || 0) + '건';
-    updateTypeBars(d.regionTypeCounts[region]);
-  }
-  // region cards
-  renderRegionCards(d, region);
-  // donut
-  updateDonutChart(d, region);
-  // bar highlight
-  updateBarChart(d, region);
-  // tabs
-  renderTabs(d, region);
-  // table
-  const rows = document.querySelectorAll('.data-row');
-  let shown = 0;
-  rows.forEach(r => {
-    const match = region === 'all' || r.dataset.region === region;
-    r.classList.toggle('hidden-row', !match);
-    if (match) shown++;
+
+function typeBadgeHTML(type) {
+  const m = TYPE_META[type] || TYPE_META.other;
+  return `<span class="type-badge" style="background:${m.color}20;color:${m.color}">${m.name}</span>`;
+}
+
+function regionBadgeHTML(region, country) {
+  const m = REGION_META[region] || REGION_META.etc;
+  return `<span class="country-badge" style="background:${m.color}">${country}</span>`;
+}
+
+function nlBadge(nl) {
+  const c = NL_COLORS[nl] || '#94A3B8';
+  return `<span style="color:${c};font-weight:600">${nl}</span>`;
+}
+
+// ─── Summary ─────────────────────────────────────────────────────
+function renderSummary() {
+  const d = ALL_MONTHLY_DATA[currentYM];
+  const emails = getFilteredEmails();
+  const total = emails.length;
+  const nlY = emails.filter(e=>e.newsletter==='Y').length;
+
+  document.getElementById('kpiTotal').textContent = total + '건';
+  document.getElementById('kpiSub').textContent = d.label + ' 총 문의';
+  document.getElementById('kpiNL').textContent = nlY + '건';
+  const pct = total > 0 ? Math.round(nlY/total*100) : 0;
+  document.getElementById('kpiNLSub').textContent = `동의율 ${pct}% (${total}건 중)`;
+
+  // Type bars
+  const typeCounts = {};
+  Object.keys(TYPE_META).forEach(t => { typeCounts[t] = emails.filter(e=>e.type===t).length; });
+  const maxType = Math.max(...Object.values(typeCounts), 1);
+  let html = '';
+  Object.entries(TYPE_META).forEach(([k,m]) => {
+    const cnt = typeCounts[k];
+    if (cnt === 0) return;
+    const pct2 = Math.round(cnt/maxType*100);
+    html += `<div class="type-row">
+      <div class="type-header"><span>${m.name}</span><span>${cnt}건</span></div>
+      <div class="type-bar-bg"><div class="type-bar-fill" style="width:${pct2}%;background:${m.color}"></div></div>
+    </div>`;
   });
-  document.getElementById('tableCount').textContent = shown + '건';
-  document.getElementById('resetBtn').style.display = region === 'all' ? 'none' : 'inline-flex';
-}
+  document.getElementById('typeBars').innerHTML = html;
 
-/* ── TYPE BARS ──────────────────────────── */
-function updateTypeBars(tc) {
-  const maxVal = Math.max(...TYPE_KEYS.map(t => tc[t] || 0), 1);
-  TYPE_KEYS.forEach(t => {
-    const count = tc[t] || 0;
-    const pct   = Math.round((count / maxVal) * 100);
-    const bar   = document.getElementById('type-bar-' + t);
-    const cnt   = document.getElementById('type-count-' + t);
-    if (bar) bar.style.width = pct + '%';
-    if (cnt) cnt.textContent = count + '건';
+  // Region bar chart
+  const regions = Object.keys(REGION_META);
+  const regionCounts = regions.map(r => emails.filter(e=>e.region===r).length);
+  if (regionChart) regionChart.destroy();
+  regionChart = new Chart(document.getElementById('regionBarChart'), {
+    type: 'bar',
+    data: {
+      labels: regions.map(r => REGION_META[r].name),
+      datasets: [{
+        data: regionCounts,
+        backgroundColor: regions.map(r => REGION_META[r].color + 'CC'),
+        borderColor: regions.map(r => REGION_META[r].color),
+        borderWidth: 1,
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y}건`}}},
+      scales: {y:{beginAtZero:true,ticks:{stepSize:1}}},
+      onClick: (e,els) => {
+        if (els.length) toggleRegion(regions[els[0].index]);
+      }
+    }
   });
-}
 
-/* ── REGION CARDS ───────────────────────── */
-function renderRegionCards(d, activeRg) {
-  REGION_KEYS.forEach(rk => {
-    const card = document.getElementById('rc-' + rk);
-    if (!card) return;
-    card.querySelector('.rc-count').textContent = d.regionCounts[rk] || 0;
-    card.querySelector('.rc-nl').textContent    = '뉴스레터 ' + (d.regionNL[rk]||0) + '명';
-    if (activeRg === 'all') {
-      card.classList.remove('active','dimmed');
-    } else if (activeRg === rk) {
-      card.classList.add('active');
-      card.classList.remove('dimmed');
-    } else {
-      card.classList.add('dimmed');
-      card.classList.remove('active');
+  // NL Donut
+  const nlCounts = [
+    emails.filter(e=>e.newsletter==='Y').length,
+    emails.filter(e=>e.newsletter==='N').length,
+    emails.filter(e=>e.newsletter!=='Y'&&e.newsletter!=='N').length,
+  ].filter((v,i)=>v>0 || ['Y','N','미표기'][i]);
+  const nlLabels = ['동의(Y)','거부(N)','미표기'];
+  const nlColors = ['#10B981','#EF4444','#94A3B8'];
+  if (nlChart) nlChart.destroy();
+  nlChart = new Chart(document.getElementById('nlDonut'), {
+    type: 'doughnut',
+    data: {
+      labels: nlLabels,
+      datasets: [{
+        data: [
+          emails.filter(e=>e.newsletter==='Y').length,
+          emails.filter(e=>e.newsletter==='N').length,
+          emails.filter(e=>e.newsletter!=='Y'&&e.newsletter!=='N').length,
+        ],
+        backgroundColor: nlColors,
+        borderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {position:'bottom',labels:{padding:16,font:{size:12}}},
+        tooltip: {callbacks: {label: ctx => `${ctx.label}: ${ctx.parsed}건 (${total>0?Math.round(ctx.parsed/total*100):0}%)`}}
+      },
+      cutout: '65%',
     }
   });
 }
 
-/* ── BAR CHART ──────────────────────────── */
-function updateBarChart(d, highlightRg) {
-  const labels = REGION_KEYS.map(rk => REGION_CONFIG[rk].name);
-  const vals   = REGION_KEYS.map(rk => d.regionCounts[rk] || 0);
-  const colors = REGION_KEYS.map(rk => {
-    if (!highlightRg || highlightRg === 'all' || highlightRg === rk)
-      return REGION_CONFIG[rk].color;
-    return REGION_CONFIG[rk].color + '44';
+// ─── Region Grid ─────────────────────────────────────────────────
+function renderRegionGrid() {
+  const emails = getFilteredEmails();
+  const grid = document.getElementById('regionGrid');
+  grid.innerHTML = '';
+  Object.entries(REGION_META).forEach(([r,m]) => {
+    const cnt = emails.filter(e=>e.region===r).length;
+    const nl = emails.filter(e=>e.region===r&&e.newsletter==='Y').length;
+    const div = document.createElement('div');
+    div.className = 'region-kpi' + (currentRegion===r?' selected':'');
+    div.style.borderTopColor = m.color;
+    div.innerHTML = `<div class="r-name">${m.name}</div>
+      <div class="r-val" style="color:${m.color}">${cnt}</div>
+      <div class="r-nl">NL동의 ${nl}건</div>`;
+    div.onclick = () => toggleRegion(r);
+    grid.appendChild(div);
   });
-  if (!barChart) {
-    const ctx = document.getElementById('barChart').getContext('2d');
-    barChart = new Chart(ctx, {
-      type: 'bar',
-      data: { labels, datasets: [{ data: vals, backgroundColor: colors, borderRadius: 6, borderSkipped: false }] },
-      options: {
-        responsive: true, maintainAspectRatio: true,
-        plugins: { legend: { display: false }, tooltip: { callbacks: {
-          label: ctx => ' ' + ctx.raw + '건'
-        }}},
-        scales: {
-          x: { grid: { display: false }, ticks: { font: { size: 10 } } },
-          y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } }, grid: { color: 'rgba(128,128,128,0.15)' } }
-        },
-        onClick: (e, els) => {
-          if (els.length) { const rk = REGION_KEYS[els[0].index]; toggleRegion(rk); }
-        }
-      }
-    });
-  } else {
-    barChart.data.datasets[0].data = vals;
-    barChart.data.datasets[0].backgroundColor = colors;
-    barChart.update();
+}
+
+// ─── Region Tabs ─────────────────────────────────────────────────
+function renderRegionTabs() {
+  const emails = getFilteredEmails();
+  const btns = document.getElementById('regionTabBtns');
+  btns.innerHTML = '';
+  const allBtn = document.createElement('button');
+  allBtn.className = 'region-tab-btn' + (currentRegion==='all'?' active':'');
+  allBtn.style.background = currentRegion==='all'?'#64748b':'';
+  allBtn.textContent = '전체 (' + emails.length + ')';
+  allBtn.onclick = () => selectRegion('all');
+  btns.appendChild(allBtn);
+
+  Object.entries(REGION_META).forEach(([r,m]) => {
+    const cnt = emails.filter(e=>e.region===r).length;
+    if (cnt === 0) return;
+    const b = document.createElement('button');
+    b.className = 'region-tab-btn' + (currentRegion===r?' active':'');
+    b.style.background = currentRegion===r ? m.color : '';
+    b.textContent = m.name + ' (' + cnt + ')';
+    b.onclick = () => selectRegion(r);
+    btns.appendChild(b);
+  });
+
+  renderEmailCards(emails);
+}
+
+function renderEmailCards(emails) {
+  const container = document.getElementById('emailCards');
+  const filtered = currentRegion === 'all' ? emails : emails.filter(e=>e.region===currentRegion);
+  container.innerHTML = '';
+  filtered.slice(0,30).forEach(e => {
+    const rm = REGION_META[e.region]||REGION_META.etc;
+    const tm = TYPE_META[e.type]||TYPE_META.other;
+    const div = document.createElement('div');
+    div.className = 'email-card';
+    div.innerHTML = `
+      <div class="email-card-header">
+        ${regionBadgeHTML(e.region, e.country)}
+        ${typeBadgeHTML(e.type)}
+      </div>
+      <div class="email-name">${e.name}</div>
+      <div class="email-date">${e.datetime}</div>
+      <div class="email-summary">${e.summary}</div>
+      <span class="action-badge">${e.action}</span>`;
+    container.appendChild(div);
+  });
+  if (filtered.length > 30) {
+    const p = document.createElement('p');
+    p.style = 'color:var(--sub);font-size:.8rem;margin-top:8px;grid-column:1/-1';
+    p.textContent = `... 및 ${filtered.length-30}건 더 (테이블에서 확인)`;
+    container.appendChild(p);
   }
 }
 
-/* ── DONUT CHART ────────────────────────── */
-function updateDonutChart(d, region) {
-  const y = region === 'all' ? Object.values(d.regionNL).reduce((a,b)=>a+b,0)
-                             : (d.regionNL[region]||0);
-  const n = region === 'all' ? Object.values(d.regionNL_N).reduce((a,b)=>a+b,0)
-                             : (d.regionNL_N[region]||0);
-  const bl= region === 'all' ? Object.values(d.regionNL_Blank).reduce((a,b)=>a+b,0)
-                             : (d.regionNL_Blank[region]||0);
-  if (!donutChart) {
-    const ctx = document.getElementById('donutChart').getContext('2d');
-    donutChart = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: ['동의(Y)', '거부(N)', '미표기'],
-        datasets: [{ data: [y,n,bl], backgroundColor: ['#16a34a','#dc2626','#94a3b8'], borderWidth: 2 }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: true,
-        plugins: {
-          legend: { position: 'bottom', labels: { font: { size: 10 }, padding: 10 } },
-          tooltip: { callbacks: { label: ctx => ' ' + ctx.raw + '건' } }
-        },
-        cutout: '62%'
-      }
-    });
-  } else {
-    donutChart.data.datasets[0].data = [y,n,bl];
-    donutChart.update();
-  }
-}
-
-/* ── TREND CHART ────────────────────────── */
-function renderTrendChart(year) {
-  const months = Object.keys(ALL_MONTHLY_DATA).sort().filter(m => m.startsWith(year));
-  const labels = months.map(m => +m.slice(5) + '월');
-  const vals   = months.map(m => ALL_MONTHLY_DATA[m].total);
-  const ptColors = months.map(m => m === currentMonth ? '#e42526' : '#2563eb');
-  const ptRadius = months.map(m => m === currentMonth ? 8 : 4);
-  if (!trendChart) {
-    const ctx = document.getElementById('trendChart').getContext('2d');
-    trendChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels,
-        datasets: [{
-          data: vals, borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.08)',
-          fill: true, tension: 0.3, pointRadius: ptRadius,
-          pointBackgroundColor: ptColors, pointBorderColor: ptColors, pointBorderWidth: 2
-        }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.raw + '건' } } },
-        scales: {
-          x: { grid: { display: false } },
-          y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: 'rgba(128,128,128,0.15)' } }
-        },
-        onClick: (e, els) => {
-          if (els.length) { loadMonth(months[els[0].index]); }
-        }
-      }
-    });
-  } else {
-    trendChart.data.labels = labels;
-    trendChart.data.datasets[0].data = vals;
-    trendChart.data.datasets[0].pointBackgroundColor = ptColors;
-    trendChart.data.datasets[0].pointBorderColor     = ptColors;
-    trendChart.data.datasets[0].pointRadius          = ptRadius;
-    trendChart.update();
-  }
-}
-
-/* ── TABS ───────────────────────────────── */
-function renderTabs(d, region) {
-  const tabsEl = document.getElementById('tabs-panels');
-  const tabBtns= document.getElementById('tabs-btns');
-  const allTabs = ['all', ...REGION_KEYS];
-  tabBtns.innerHTML = allTabs.map(rk => {
-    const name = rk === 'all' ? '전체' : REGION_CONFIG[rk].name;
-    return `<button class="tab-btn${rk === region ? ' active':''}" onclick="switchTab('${rk}')">${name}</button>`;
-  }).join('');
-  tabsEl.innerHTML = allTabs.map(rk => {
-    const emails = rk === 'all' ? d.emails : d.emails.filter(e => e.region === rk);
-    const isActive = rk === region;
-    if (!emails.length) {
-      return `<div class="tab-panel${isActive?' active':''}" id="tp-${rk}"><div class="empty-state">이번 달 ${rk==='all'?'전체':REGION_CONFIG[rk].name} 문의 없음</div></div>`;
-    }
-    const cards = emails.map(e => buildEmailCard(e)).join('');
-    return `<div class="tab-panel${isActive?' active':''}" id="tp-${rk}">${cards}</div>`;
-  }).join('');
-}
-function switchTab(rk) {
-  selectRegion(rk);
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => { if(b.textContent === (rk==='all'?'전체':REGION_CONFIG[rk]?.name)) b.classList.add('active'); });
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  const panel = document.getElementById('tp-' + rk);
-  if (panel) panel.classList.add('active');
-}
-function buildEmailCard(e) {
-  const color = REGION_CONFIG[e.region]?.color || '#6B7280';
-  const tname = TYPE_CONFIG[e.type]?.name || e.type;
-  const tcolor= TYPE_CONFIG[e.type]?.color || '#6B7280';
-  const nlClass = e.newsletter==='Y'?'nl-badge-y':e.newsletter==='N'?'nl-badge-n':'nl-badge-blank';
-  return `<div class="email-card">
-    <div class="ec-head">
-      <span class="badge" style="background:${color}">${REGION_CONFIG[e.region]?.name}</span>
-      <span class="badge" style="background:${tcolor}">${tname}</span>
-    </div>
-    <div class="ec-name">${e.name}</div>
-    <div class="ec-meta">${e.datetime} &nbsp;|&nbsp; ${e.country}</div>
-    <div class="ec-meta">${e.email} &nbsp;|&nbsp; ${e.phone}</div>
-    <div class="ec-summary">${e.summary}</div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;">
-      <span class="${nlClass}">뉴스레터 ${e.newsletter}</span>
-      <span class="ec-action">${e.action}</span>
-    </div>
-  </div>`;
-}
-
-/* ── TABLE ──────────────────────────────── */
-function renderTable(emails) {
-  const tbody = document.getElementById('tbody');
-  tbody.innerHTML = [...emails].reverse().map((e, i) => {
-    const color = REGION_CONFIG[e.region]?.color || '#6B7280';
-    const tname = TYPE_CONFIG[e.type]?.name || e.type;
-    const tcolor= TYPE_CONFIG[e.type]?.color || '#6B7280';
-    const nlClass = e.newsletter==='Y'?'nl-badge-y':e.newsletter==='N'?'nl-badge-n':'nl-badge-blank';
-    return `<tr class="data-row" data-region="${e.region}">
-      <td>${emails.length - i}</td>
+// ─── Table ───────────────────────────────────────────────────────
+function renderTable() {
+  const emails = getFilteredEmails();
+  const filtered = currentRegion === 'all' ? emails : emails.filter(e=>e.region===currentRegion);
+  document.getElementById('filterInfo').textContent = 
+    currentRegion==='all' ? `전체 ${filtered.length}건` : `${REGION_META[currentRegion]?.name} ${filtered.length}건`;
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  filtered.forEach(e => {
+    const rm = REGION_META[e.region]||REGION_META.etc;
+    const tm = TYPE_META[e.type]||TYPE_META.other;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
       <td style="white-space:nowrap">${e.datetime}</td>
-      <td><span class="badge" style="background:${color};white-space:nowrap">${REGION_CONFIG[e.region]?.name}</span></td>
+      <td><span style="color:${rm.color};font-weight:600">${rm.name}</span></td>
       <td>${e.country}</td>
       <td>${e.name}</td>
-      <td style="font-size:0.72rem">${e.email}</td>
-      <td>${e.phone}</td>
-      <td><span class="badge" style="background:${tcolor}">${tname}</span></td>
-      <td class="${nlClass}">${e.newsletter}</td>
-      <td style="font-size:0.72rem">${e.action}</td>
-    </tr>`;
-  }).join('');
+      <td style="font-size:.75rem">${e.email}</td>
+      <td style="font-size:.75rem">${e.phone}</td>
+      <td><span style="color:${tm.color};font-weight:600">${tm.name}</span></td>
+      <td>${nlBadge(e.newsletter)}</td>
+      <td style="max-width:200px">${e.summary}</td>
+      <td style="font-size:.75rem;color:var(--accent)">${e.action}</td>`;
+    tbody.appendChild(tr);
+  });
 }
 
-/* ── THEME ──────────────────────────────── */
-function toggleTheme() {
-  const body = document.body;
-  const isDark = body.dataset.theme === 'dark';
-  body.dataset.theme = isDark ? 'light' : 'dark';
-  document.getElementById('themeBtn').textContent = isDark ? '🌙 다크모드' : '☀️ 라이트모드';
+// ─── Trend Chart ─────────────────────────────────────────────────
+function renderTrendChart(year) {
+  const labels = MONTHS.map(m => m + '월');
+  const totals = MONTHS.map(m => (ALL_MONTHLY_DATA[year+'-'+m]?.total) || null);
+  const nlYs = MONTHS.map(m => (ALL_MONTHLY_DATA[year+'-'+m]?.nlY) || null);
+  const ptColors = MONTHS.map(m => year+'-'+m===currentYM ? '#e42526' : '#3b82f6');
+  if (trendChart) trendChart.destroy();
+  trendChart = new Chart(document.getElementById('trendChart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: '총 문의',
+          data: totals,
+          borderColor: '#3b82f6',
+          backgroundColor: '#3b82f620',
+          tension: .3,
+          fill: true,
+          pointBackgroundColor: ptColors,
+          pointRadius: MONTHS.map(m => year+'-'+m===currentYM ? 7 : 4),
+          pointHoverRadius: 7,
+          spanGaps: false,
+        },
+        {
+          label: 'NL 동의(Y)',
+          data: nlYs,
+          borderColor: '#10b981',
+          borderDash: [4,4],
+          tension: .3,
+          fill: false,
+          pointBackgroundColor: '#10b981',
+          pointRadius: 3,
+          spanGaps: false,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {position:'top',labels:{boxWidth:12,font:{size:11}}},
+        tooltip: {mode:'index',intersect:false}
+      },
+      scales: {y:{beginAtZero:true,ticks:{stepSize:1}}},
+      onClick: (e, els) => {
+        const idx = els[0]?.index;
+        if (idx !== undefined) loadMonth(year+'-'+MONTHS[idx]);
+      }
+    }
+  });
 }
+
+// ─── Region Toggle ───────────────────────────────────────────────
+function toggleRegion(r) {
+  currentRegion = currentRegion === r ? 'all' : r;
+  renderSummary();
+  renderRegionGrid();
+  renderRegionTabs();
+  renderTable();
+}
+
+function selectRegion(r) {
+  currentRegion = r;
+  renderSummary();
+  renderRegionGrid();
+  renderRegionTabs();
+  renderTable();
+}
+
+// ─── Dark Mode ───────────────────────────────────────────────────
+function toggleDark() {
+  document.body.classList.toggle('dark');
+}
+
+// ─── Start ───────────────────────────────────────────────────────
+init();
 </script>
-
-<!-- HEADER -->
-<div class="header">
-  <div class="container">
-    <div class="header-inner">
-      <div class="header-title">
-        <h1>CTR Aftermarket Website 고객 문의 누적 보고서</h1>
-        <p>월별 문의 현황 누적 집계 &nbsp;|&nbsp; 마지막 업데이트: 2026-04-17 08:30 (KST)</p>
-      </div>
-      <div class="header-actions">
-        <button class="btn" id="themeBtn" onclick="toggleTheme()">🌙 다크모드</button>
-        <button class="btn btn-accent" onclick="window.print()">🖨️ 인쇄</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- MONTH NAV -->
-<div class="month-nav">
-  <div class="container">
-    <div class="year-tabs" id="year-tabs"></div>
-    <div class="month-btns" id="month-btns"></div>
-  </div>
-</div>
-
-<!-- SUMMARY -->
-<div class="section">
-  <div class="container">
-    <div class="section-title">📊 <span id="summary-title">선택 월 요약</span></div>
-    <div class="summary-grid">
-      <!-- LEFT: KPI COL -->
-      <div class="kpi-col">
-        <div class="kpi-card accent">
-          <div class="label">총 문의 건수</div>
-          <div class="value" id="kpi-total">-</div>
-        </div>
-        <div class="kpi-card green">
-          <div class="label">뉴스레터 동의</div>
-          <div class="value" id="kpi-nl">-</div>
-        </div>
-        <div class="type-card">
-          <div class="tc-label">문의 유형별 현황</div>
-          <div id="type-bars-container">
-            <div class="type-row"><span class="type-dot" style="background:#0EA5E9"></span><span class="type-name">부품 정보</span><div class="type-bar-wrap"><div class="type-bar-fill" id="type-bar-parts" style="background:#0EA5E9;width:0%"></div></div><span class="type-count" id="type-count-parts">0건</span></div>
-            <div class="type-row"><span class="type-dot" style="background:#10B981"></span><span class="type-name">구매/주문</span><div class="type-bar-wrap"><div class="type-bar-fill" id="type-bar-purchase" style="background:#10B981;width:0%"></div></div><span class="type-count" id="type-count-purchase">0건</span></div>
-            <div class="type-row"><span class="type-dot" style="background:#F59E0B"></span><span class="type-name">가격/견적</span><div class="type-bar-wrap"><div class="type-bar-fill" id="type-bar-price" style="background:#F59E0B;width:0%"></div></div><span class="type-count" id="type-count-price">0건</span></div>
-            <div class="type-row"><span class="type-dot" style="background:#8B5CF6"></span><span class="type-name">기술 지원</span><div class="type-bar-wrap"><div class="type-bar-fill" id="type-bar-technical" style="background:#8B5CF6;width:0%"></div></div><span class="type-count" id="type-count-technical">0건</span></div>
-            <div class="type-row"><span class="type-dot" style="background:#EF4444"></span><span class="type-name">불만/A·S</span><div class="type-bar-wrap"><div class="type-bar-fill" id="type-bar-complaint" style="background:#EF4444;width:0%"></div></div><span class="type-count" id="type-count-complaint">0건</span></div>
-            <div class="type-row"><span class="type-dot" style="background:#9CA3AF"></span><span class="type-name">내용 없음</span><div class="type-bar-wrap"><div class="type-bar-fill" id="type-bar-empty" style="background:#9CA3AF;width:0%"></div></div><span class="type-count" id="type-count-empty">0건</span></div>
-            <div class="type-row"><span class="type-dot" style="background:#6B7280"></span><span class="type-name">기타</span><div class="type-bar-wrap"><div class="type-bar-fill" id="type-bar-other" style="background:#6B7280;width:0%"></div></div><span class="type-count" id="type-count-other">0건</span></div>
-          </div>
-        </div>
-      </div>
-      <!-- CENTER: BAR CHART -->
-      <div class="chart-card">
-        <div class="chart-title">지역별 문의 건수 (클릭하여 필터)</div>
-        <canvas id="barChart"></canvas>
-      </div>
-      <!-- RIGHT: DONUT CHART -->
-      <div class="chart-card">
-        <div class="chart-title">뉴스레터 동의율</div>
-        <canvas id="donutChart"></canvas>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- TREND -->
-<div class="section">
-  <div class="container">
-    <div class="section-title">📈 <span>연간 월별 추이</span></div>
-    <div class="trend-card" style="height:200px">
-      <canvas id="trendChart" style="height:100%"></canvas>
-    </div>
-  </div>
-</div>
-
-<!-- REGION CARDS -->
-<div class="section">
-  <div class="container">
-    <div class="section-title">🌍 <span>지역별 현황 (클릭하여 필터)</span></div>
-    <div class="region-grid">
-      <div class="region-card" id="rc-na" onclick="toggleRegion('na')" style="border-color:#2563EB">
-        <div class="rc-name" style="color:#2563EB">북미</div>
-        <div class="rc-count" style="color:#2563EB">0</div>
-        <div class="rc-nl">뉴스레터 0명</div>
-      </div>
-      <div class="region-card" id="rc-latam" onclick="toggleRegion('latam')" style="border-color:#DC2626">
-        <div class="rc-name" style="color:#DC2626">중남미</div>
-        <div class="rc-count" style="color:#DC2626">0</div>
-        <div class="rc-nl">뉴스레터 0명</div>
-      </div>
-      <div class="region-card" id="rc-eu" onclick="toggleRegion('eu')" style="border-color:#EA580C">
-        <div class="rc-name" style="color:#EA580C">유럽</div>
-        <div class="rc-count" style="color:#EA580C">0</div>
-        <div class="rc-nl">뉴스레터 0명</div>
-      </div>
-      <div class="region-card" id="rc-sea" onclick="toggleRegion('sea')" style="border-color:#16A34A">
-        <div class="rc-name" style="color:#16A34A">동남아</div>
-        <div class="rc-count" style="color:#16A34A">0</div>
-        <div class="rc-nl">뉴스레터 0명</div>
-      </div>
-      <div class="region-card" id="rc-af" onclick="toggleRegion('af')" style="border-color:#7C3AED">
-        <div class="rc-name" style="color:#7C3AED">아중동</div>
-        <div class="rc-count" style="color:#7C3AED">0</div>
-        <div class="rc-nl">뉴스레터 0명</div>
-      </div>
-      <div class="region-card" id="rc-cis" onclick="toggleRegion('cis')" style="border-color:#0891B2">
-        <div class="rc-name" style="color:#0891B2">CIS</div>
-        <div class="rc-count" style="color:#0891B2">0</div>
-        <div class="rc-nl">뉴스레터 0명</div>
-      </div>
-      <div class="region-card" id="rc-ru" onclick="toggleRegion('ru')" style="border-color:#65A30D">
-        <div class="rc-name" style="color:#65A30D">러시아</div>
-        <div class="rc-count" style="color:#65A30D">0</div>
-        <div class="rc-nl">뉴스레터 0명</div>
-      </div>
-      <div class="region-card" id="rc-etc" onclick="toggleRegion('etc')" style="border-color:#6B7280">
-        <div class="rc-name" style="color:#6B7280">기타</div>
-        <div class="rc-count" style="color:#6B7280">0</div>
-        <div class="rc-nl">뉴스레터 0명</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- TABS -->
-<div class="section">
-  <div class="container">
-    <div class="section-title">📬 <span>문의 카드 뷰</span></div>
-    <div class="tabs-header" id="tabs-btns"></div>
-    <div id="tabs-panels"></div>
-  </div>
-</div>
-
-<!-- TABLE -->
-<div class="section">
-  <div class="container">
-    <div class="table-header">
-      <div class="section-title" style="margin:0">📋 <span>상세 데이터 테이블 &nbsp;<small id="tableCount" style="font-size:0.8rem;color:var(--sub)"></small></span></div>
-      <button class="btn btn-accent" id="resetBtn" onclick="selectRegion('all')" style="display:none">✕ 전체 보기</button>
-    </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th><th>수신일시(KST)</th><th>지역</th><th>국가</th><th>이름</th>
-            <th>이메일</th><th>전화</th><th>문의유형</th><th>뉴스레터</th><th>권고사항</th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- FOOTER -->
-<footer>
-  <div class="container">
-    <p>마지막 업데이트: 2026-04-17 08:30 (KST)</p>
-    <p style="margin-top:6px;color:var(--sub)">본 보고서는 자동화 시스템에 의해 생성되었습니다.</p>
-  </div>
-</footer>
-
 </body>
 </html>
