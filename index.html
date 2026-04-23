@@ -2,979 +2,473 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CTR Aftermarket Website — 고객 문의 누적 보고서</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CTR Aftermarket Website 고객 문의 누적 보고서</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
-:root {
-  --bg: #f8fafc; --card: #ffffff; --text: #0f172a; --sub: #64748b;
-  --border: #e2e8f0; --hover: #f1f5f9; --accent: #e42526;
-  --accent2: #1e40af; --shadow: 0 1px 3px rgba(0,0,0,.08);
-}
-.dark {
-  --bg: #0f172a; --card: #1e293b; --text: #e2e8f0; --sub: #94a3b8;
-  --border: #334155; --hover: #2d3d52; --shadow: 0 1px 3px rgba(0,0,0,.3);
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); transition: background .3s, color .3s; }
-a { color: inherit; text-decoration: none; }
-
+:root{--bg:#f8fafc;--card:#fff;--text:#0f172a;--sub:#64748b;--border:#e2e8f0;--accent:#e42526;--accent2:#1e40af}
+.dark{--bg:#0f172a;--card:#1e293b;--text:#e2e8f0;--sub:#94a3b8;--border:#334155;--accent:#e42526;--accent2:#3b82f6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;transition:background .3s,color .3s;min-height:100vh}
+.container{max-width:1400px;margin:0 auto;padding:24px}
 /* Header */
-.header { background: var(--card); border-bottom: 2px solid var(--accent); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); }
-.header-left h1 { font-size: 1.2rem; font-weight: 700; color: var(--accent); }
-.header-left p { font-size: .75rem; color: var(--sub); margin-top: 2px; }
-.header-right { display: flex; gap: 8px; align-items: center; }
-.btn { padding: 6px 14px; border-radius: 6px; border: 1px solid var(--border); background: var(--card); color: var(--text); cursor: pointer; font-size: .8rem; transition: all .2s; }
-.btn:hover { background: var(--hover); }
-.btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-.btn-primary:hover { opacity: .85; }
-
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;gap:12px}
+.header-left h1{font-size:1.6rem;font-weight:700;color:var(--accent)}
+.header-left p{font-size:.85rem;color:var(--sub);margin-top:4px}
+.header-right{display:flex;gap:10px}
+.btn{padding:8px 16px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:.85rem;transition:all .2s}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
 /* Nav */
-.nav-wrap { background: var(--card); border-bottom: 1px solid var(--border); padding: 10px 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-.year-tab { padding: 4px 12px; border-radius: 6px; font-weight: 600; font-size: .85rem; cursor: pointer; background: var(--hover); color: var(--sub); transition: all .2s; }
-.year-tab.active { background: var(--accent); color: #fff; }
-.month-btn { padding: 4px 10px; border-radius: 6px; font-size: .8rem; cursor: pointer; background: var(--hover); color: var(--sub); border: 1px solid var(--border); transition: all .2s; }
-.month-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-.month-btn:hover:not(.active) { border-color: var(--accent); color: var(--accent); }
-
-/* Main layout */
-.main { padding: 20px 24px; max-width: 1400px; margin: 0 auto; }
-
-/* Section header */
-.sec-title { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-.sec-title::before { content: ''; width: 4px; height: 18px; background: var(--accent); border-radius: 2px; display: inline-block; }
-
+.nav{margin-bottom:20px}
+.year-tabs{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.year-tab{padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:.85rem;transition:all .2s}
+.year-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.month-btns{display:flex;gap:6px;flex-wrap:wrap}
+.month-btn{padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:.82rem;transition:all .2s}
+.month-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 /* Grid */
-.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
-.grid-8 { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; margin-bottom: 24px; }
-@media(max-width:1100px) { .grid-3 { grid-template-columns: 1fr 1fr; } .grid-8 { grid-template-columns: repeat(4,1fr); } }
-@media(max-width:700px) { .grid-3 { grid-template-columns: 1fr; } .grid-8 { grid-template-columns: repeat(2,1fr); } }
-
-/* Card */
-.card { background: var(--card); border-radius: 12px; padding: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); }
-
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px}
+@media(max-width:900px){.grid3{grid-template-columns:1fr}}
+/* Cards */
+.card{background:var(--card);border-radius:12px;padding:20px;border:1px solid var(--border)}
+.card h3{font-size:.95rem;font-weight:600;color:var(--sub);margin-bottom:14px;text-transform:uppercase;letter-spacing:.05em}
 /* KPI */
-.kpi-val { font-size: 2.2rem; font-weight: 800; color: var(--accent); line-height: 1; margin: 6px 0; }
-.kpi-label { font-size: .75rem; color: var(--sub); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
-.kpi-sub { font-size: .8rem; color: var(--sub); margin-top: 4px; }
-
-/* Progress bar */
-.prog-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: .78rem; }
-.prog-label { width: 70px; color: var(--sub); }
-.prog-bar-wrap { flex: 1; background: var(--border); border-radius: 4px; height: 8px; overflow: hidden; }
-.prog-bar { height: 100%; border-radius: 4px; transition: width .5s; }
-.prog-count { width: 24px; text-align: right; font-weight: 600; }
-
-/* Region KPI card */
-.region-kpi { cursor: pointer; transition: all .2s; border: 2px solid var(--border); }
-.region-kpi:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.12); }
-.region-kpi.selected { border-color: var(--accent); background: #fff5f5; }
-.dark .region-kpi.selected { background: #2d1515; }
-.region-kpi .r-name { font-size: .7rem; font-weight: 700; color: var(--sub); text-transform: uppercase; }
-.region-kpi .r-count { font-size: 1.6rem; font-weight: 800; margin: 4px 0; }
-.region-kpi .r-nl { font-size: .7rem; color: var(--sub); }
-.region-kpi .r-badge { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; }
-
-/* Tabs */
-.tab-wrap { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
-.tab-btn { padding: 6px 14px; border-radius: 20px; font-size: .8rem; cursor: pointer; border: 1px solid var(--border); background: var(--card); color: var(--sub); transition: all .2s; }
-.tab-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-
-/* Email card */
-.email-card { background: var(--card); border-radius: 10px; padding: 14px; border: 1px solid var(--border); margin-bottom: 10px; box-shadow: var(--shadow); }
-.email-card:hover { border-color: var(--accent); }
-.ec-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
-.ec-name { font-weight: 700; font-size: .95rem; }
-.ec-date { font-size: .72rem; color: var(--sub); }
-.ec-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
-.badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: .7rem; font-weight: 600; color: #fff; }
-.badge-country { background: #475569; }
-.ec-summary { font-size: .82rem; color: var(--sub); margin-top: 8px; line-height: 1.5; }
-.ec-action { font-size: .75rem; font-weight: 600; margin-top: 8px; }
-.ec-contact { font-size: .72rem; color: var(--sub); margin-top: 4px; }
-
+.kpi-val{font-size:2.4rem;font-weight:800;color:var(--accent);line-height:1}
+.kpi-label{font-size:.8rem;color:var(--sub);margin-top:4px}
+.kpi-sub{font-size:.9rem;color:var(--text);margin-top:8px}
+/* Type progress bars */
+.type-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:.83rem}
+.type-name{width:70px;color:var(--sub);flex-shrink:0}
+.type-bar-wrap{flex:1;background:var(--border);border-radius:4px;height:10px;overflow:hidden}
+.type-bar{height:10px;border-radius:4px;transition:width .4s}
+.type-count{width:28px;text-align:right;font-weight:600;color:var(--text)}
+/* Chart containers */
+.chart-wrap{position:relative;height:260px}
+/* Trend section */
+.trend-section{margin-bottom:20px}
+.trend-chart-wrap{position:relative;height:220px}
+/* Region grid */
+.region-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+@media(max-width:800px){.region-grid{grid-template-columns:repeat(2,1fr)}}
+.region-card{background:var(--card);border-radius:10px;padding:14px;border:2px solid var(--border);cursor:pointer;transition:all .2s}
+.region-card:hover,.region-card.active{border-color:var(--accent);box-shadow:0 0 0 3px rgba(228,37,38,.15)}
+.region-card.active{background:rgba(228,37,38,.05)}
+.region-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.72rem;font-weight:700;color:#fff;margin-bottom:6px}
+.region-name{font-size:.78rem;color:var(--sub);margin-bottom:4px}
+.region-cnt{font-size:1.5rem;font-weight:800;color:var(--text)}
+.region-nl{font-size:.75rem;color:var(--sub);margin-top:2px}
+/* Region tabs / email cards */
+.region-filter-label{font-size:.85rem;color:var(--sub);margin-bottom:12px}
+.email-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:20px}
+.email-card{background:var(--card);border-radius:10px;padding:14px;border:1px solid var(--border)}
+.email-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.country-badge{padding:2px 8px;border-radius:4px;font-size:.72rem;font-weight:700;color:#fff}
+.date-text{font-size:.75rem;color:var(--sub)}
+.email-name{font-weight:600;font-size:.9rem;margin-bottom:4px}
+.email-summary{font-size:.82rem;color:var(--sub);line-height:1.4;margin-bottom:8px}
+.action-badge{display:inline-block;padding:3px 8px;border-radius:4px;font-size:.72rem;background:rgba(228,37,38,.1);color:var(--accent);border:1px solid rgba(228,37,38,.2)}
 /* Table */
-.table-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; font-size: .8rem; }
-th { background: var(--hover); padding: 10px 12px; text-align: left; font-weight: 700; color: var(--sub); font-size: .72rem; text-transform: uppercase; border-bottom: 2px solid var(--border); white-space: nowrap; }
-td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-tr:hover td { background: var(--hover); }
-
-/* Chart container */
-.chart-container { position: relative; height: 220px; }
-
-/* Reset btn */
-.reset-btn { font-size: .75rem; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--card); color: var(--sub); cursor: pointer; }
-.reset-btn:hover { border-color: var(--accent); color: var(--accent); }
-
+.table-section{margin-bottom:20px}
+.table-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th{background:var(--card);border:1px solid var(--border);padding:8px 10px;text-align:left;font-weight:600;color:var(--sub);white-space:nowrap}
+td{border:1px solid var(--border);padding:8px 10px;color:var(--text)}
+tr:nth-child(even) td{background:rgba(0,0,0,.02)}
+.dark tr:nth-child(even) td{background:rgba(255,255,255,.02)}
 /* Footer */
-.footer { text-align: center; padding: 24px; font-size: .75rem; color: var(--sub); border-top: 1px solid var(--border); margin-top: 32px; }
-
-/* Divider */
-.divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
-
-/* No data */
-.no-data { text-align: center; padding: 40px; color: var(--sub); font-size: .9rem; }
-
-@media print {
-  .header-right, .nav-wrap, .tab-wrap, .reset-btn { display: none; }
-  .card { box-shadow: none; border: 1px solid #ddd; }
-}
+footer{text-align:center;padding:20px;color:var(--sub);font-size:.8rem;border-top:1px solid var(--border);margin-top:20px}
+.reset-btn{padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:.8rem}
+.reset-btn:hover{border-color:var(--accent);color:var(--accent)}
+@media print{.header-right,.nav,.region-grid button{display:none}}
 </style>
 </head>
 <body>
+<div class="container">
 
 <!-- Header -->
 <div class="header">
   <div class="header-left">
-    <h1>CTR Aftermarket Website — 고객 문의 누적 보고서</h1>
-    <p>마지막 업데이트: 2026-04-23 08:30 (KST) &nbsp;|&nbsp; GitHub Pages 자동 배포</p>
+    <h1>🚗 CTR Aftermarket 고객 문의 보고서</h1>
+    <p id="update-time">마지막 업데이트: 2026-04-24 08:30 (KST)</p>
   </div>
   <div class="header-right">
     <button class="btn" onclick="toggleDark()">🌙 다크모드</button>
-    <button class="btn btn-primary" onclick="window.print()">🖨️ 인쇄</button>
+    <button class="btn" onclick="window.print()">🖨️ 인쇄</button>
   </div>
 </div>
 
-<!-- Year/Month Navigator -->
-<div class="nav-wrap" id="navWrap"></div>
+<!-- Month Navigator -->
+<div class="nav">
+  <div class="year-tabs" id="year-tabs"></div>
+  <div class="month-btns" id="month-btns"></div>
+</div>
 
-<!-- Main -->
-<div class="main">
-
-  <!-- Section 1: 선택 월 요약 -->
-  <div class="sec-title" id="monthTitle">2026년 04월 요약</div>
-  <div class="grid-3" id="summaryGrid">
-    <!-- Left: KPI + 유형 -->
-    <div>
-      <div class="card" style="margin-bottom:12px;">
-        <div class="kpi-label">총 문의 건수</div>
-        <div class="kpi-val" id="kpiTotal">—</div>
-        <div class="kpi-sub" id="kpiSub">선택 월 기준</div>
-      </div>
-      <div class="card" style="margin-bottom:12px;">
-        <div class="kpi-label">뉴스레터 동의</div>
-        <div class="kpi-val" id="kpiNL">—</div>
-        <div class="kpi-sub" id="kpiNLSub">마케팅 DB 추가 대상</div>
-      </div>
-      <div class="card">
-        <div class="kpi-label" style="margin-bottom:10px;">문의 유형 분류</div>
-        <div id="typeProgress"></div>
-      </div>
+<!-- Summary 3-col grid -->
+<div class="grid3">
+  <!-- Left: KPIs + Type card -->
+  <div>
+    <div class="card" style="margin-bottom:12px">
+      <h3>총 문의 건수</h3>
+      <div class="kpi-val" id="kpi-total">-</div>
+      <div class="kpi-label" id="kpi-month-label"></div>
+      <div class="kpi-sub" id="kpi-region-sub"></div>
     </div>
-    <!-- Middle: Bar chart -->
-    <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <span style="font-weight:700;font-size:.9rem;">지역별 문의 건수</span>
-        <button class="reset-btn" onclick="selectRegion('all')">전체 보기</button>
-      </div>
-      <div class="chart-container"><canvas id="barChart"></canvas></div>
+    <div class="card" style="margin-bottom:12px">
+      <h3>뉴스레터 동의</h3>
+      <div class="kpi-val" id="kpi-nl">-</div>
+      <div class="kpi-label" id="kpi-nl-label"></div>
+      <div class="kpi-sub" id="kpi-nl-sub"></div>
     </div>
-    <!-- Right: Donut chart -->
     <div class="card">
-      <div style="font-weight:700;font-size:.9rem;margin-bottom:10px;">뉴스레터 동의율</div>
-      <div class="chart-container"><canvas id="donutChart"></canvas></div>
+      <h3>문의 유형</h3>
+      <div id="type-bars"></div>
     </div>
   </div>
-
-  <!-- Section 2: 연간 추이 -->
-  <div class="sec-title">연간 문의 추이</div>
-  <div class="card" style="margin-bottom:24px;">
-    <div class="chart-container" style="height:180px;"><canvas id="trendChart"></canvas></div>
+  <!-- Center: Bar chart -->
+  <div class="card">
+    <h3>지역별 문의 건수</h3>
+    <div class="chart-wrap"><canvas id="bar-chart"></canvas></div>
+    <p style="font-size:.75rem;color:var(--sub);margin-top:8px">* 클릭하여 지역 필터링</p>
   </div>
+  <!-- Right: Donut chart -->
+  <div class="card">
+    <h3>뉴스레터 동의율</h3>
+    <div class="chart-wrap"><canvas id="donut-chart"></canvas></div>
+  </div>
+</div>
 
-  <!-- Section 3: 지역별 KPI -->
-  <div class="sec-title">지역별 현황</div>
-  <div class="grid-8" id="regionGrid"></div>
+<!-- Trend -->
+<div class="card trend-section">
+  <h3>월별 문의 추이</h3>
+  <div class="trend-chart-wrap"><canvas id="trend-chart"></canvas></div>
+</div>
 
-  <!-- Section 4: 이메일 카드 뷰 -->
-  <div class="sec-title">문의 상세 (카드뷰)</div>
-  <div class="tab-wrap" id="regionTabs"></div>
-  <div id="emailCards"></div>
+<!-- Region KPI Grid -->
+<div class="region-grid" id="region-grid"></div>
 
-  <hr class="divider">
+<!-- Email Cards -->
+<div class="card" style="margin-bottom:20px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <h3 id="email-section-title">이메일 상세</h3>
+    <button class="reset-btn" onclick="selectRegion('all')">전체 보기</button>
+  </div>
+  <div class="email-grid" id="email-grid"></div>
+</div>
 
-  <!-- Section 5: 상세 테이블 -->
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-    <div class="sec-title" style="margin-bottom:0;">전체 데이터 테이블</div>
+<!-- Table -->
+<div class="card table-section">
+  <div class="table-header">
+    <h3>상세 데이터 테이블</h3>
     <button class="reset-btn" onclick="selectRegion('all')">필터 초기화</button>
   </div>
-  <div class="card">
-    <div class="table-wrap">
-      <table id="dataTable">
-        <thead>
-          <tr>
-            <th>수신일시</th><th>지역</th><th>국가</th><th>이름</th>
-            <th>이메일</th><th>유형</th><th>뉴스레터</th><th>요약</th><th>권고사항</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-      </table>
-    </div>
+  <div class="table-wrap">
+    <table id="data-table">
+      <thead><tr>
+        <th>수신일시</th><th>지역</th><th>국가</th><th>이름</th>
+        <th>유형</th><th>뉴스레터</th><th>문의 요약</th><th>권고사항</th>
+      </tr></thead>
+      <tbody id="table-body"></tbody>
+    </table>
   </div>
-
 </div>
 
-<div class="footer">
-  CTR Co., Ltd. Aftermarket Division &nbsp;|&nbsp; 자동 생성 보고서 &nbsp;|&nbsp; 매일 08:30 KST 갱신
+<footer>CTR Co.,Ltd. Aftermarket Division · 자동화 보고서 · 매일 08:30 KST 갱신</footer>
 </div>
 
 <script>
 // __DATA_START__
-const ALL_MONTHLY_DATA = {
-  "2026-04": {
-    "label": "2026년 04월",
-    "total": 26,
-    "nlY": 22,
-    "typeCounts": {
-      "parts": 7,
-      "purchase": 10,
-      "price": 4,
-      "technical": 0,
-      "complaint": 1,
-      "empty": 1,
-      "other": 3
-    },
-    "regionCounts": {
-      "na": 6,
-      "latam": 2,
-      "eu": 2,
-      "sea": 0,
-      "af": 3,
-      "cis": 5,
-      "ru": 1,
-      "etc": 7
-    },
-    "regionNL": {
-      "na": 4,
-      "latam": 1,
-      "eu": 2,
-      "sea": 0,
-      "af": 2,
-      "cis": 5,
-      "ru": 1,
-      "etc": 7
-    },
-    "regionNL_N": {
-      "na": 0,
-      "latam": 1,
-      "eu": 0,
-      "sea": 0,
-      "af": 1,
-      "cis": 0,
-      "ru": 0,
-      "etc": 0
-    },
-    "regionNL_Blank": {
-      "na": 2,
-      "latam": 0,
-      "eu": 0,
-      "sea": 0,
-      "af": 0,
-      "cis": 0,
-      "ru": 0,
-      "etc": 0
-    },
-    "regionTypeCounts": {
-      "na": {
-        "parts": 3,
-        "purchase": 3,
-        "price": 0,
-        "technical": 0,
-        "complaint": 0,
-        "empty": 0,
-        "other": 0
-      },
-      "latam": {
-        "parts": 0,
-        "purchase": 1,
-        "price": 1,
-        "technical": 0,
-        "complaint": 0,
-        "empty": 0,
-        "other": 0
-      },
-      "eu": {
-        "parts": 1,
-        "purchase": 0,
-        "price": 0,
-        "technical": 0,
-        "complaint": 0,
-        "empty": 0,
-        "other": 1
-      },
-      "sea": {
-        "parts": 0,
-        "purchase": 0,
-        "price": 0,
-        "technical": 0,
-        "complaint": 0,
-        "empty": 0,
-        "other": 0
-      },
-      "af": {
-        "parts": 0,
-        "purchase": 2,
-        "price": 0,
-        "technical": 0,
-        "complaint": 0,
-        "empty": 0,
-        "other": 1
-      },
-      "cis": {
-        "parts": 1,
-        "purchase": 2,
-        "price": 0,
-        "technical": 0,
-        "complaint": 1,
-        "empty": 1,
-        "other": 0
-      },
-      "ru": {
-        "parts": 1,
-        "purchase": 0,
-        "price": 0,
-        "technical": 0,
-        "complaint": 0,
-        "empty": 0,
-        "other": 0
-      },
-      "etc": {
-        "parts": 1,
-        "purchase": 2,
-        "price": 3,
-        "technical": 0,
-        "complaint": 0,
-        "empty": 0,
-        "other": 1
-      }
-    },
-    "emails": [
-      {
-        "datetime": "2026-04-02 00:40 (KST)",
-        "region": "latam",
-        "country": "Mexico",
-        "name": "Antonio Vazquez",
-        "email": "antoniovg93@hotmail.fr",
-        "phone": "5551021984",
-        "type": "purchase",
-        "newsletter": "N",
-        "summary": "AAPEX Vegas에서 CTR 브랜드 인지, 멕시코 도매업체로 제품 구매 희망",
-        "action": "영업팀 연락 필요"
-      },
-      {
-        "datetime": "2026-04-02 20:33 (KST)",
-        "region": "af",
-        "country": "South Africa",
-        "name": "Ethan Mayer",
-        "email": "ethan@autoindustrialafrica.com",
-        "phone": "+27115680710",
-        "type": "other",
-        "newsletter": "Y",
-        "summary": "Auto Industrial Review Africa 2026 특별판 광고 게재 제안",
-        "action": "담당자 검토 필요"
-      },
-      {
-        "datetime": "2026-04-03 03:21 (KST)",
-        "region": "na",
-        "country": "United States",
-        "name": "Mitch",
-        "email": "mccuculis@outlook.com",
-        "phone": "7174289138",
-        "type": "purchase",
-        "newsletter": "미표기",
-        "summary": "CQ0465L/R 부품 구매를 위한 미국 내 소매업체 문의 (중복 제출)",
-        "action": "영업팀 연락 필요"
-      },
-      {
-        "datetime": "2026-04-03 03:22 (KST)",
-        "region": "na",
-        "country": "United States",
-        "name": "Mitch",
-        "email": "mccuculis@outlook.com",
-        "phone": "7174289138",
-        "type": "purchase",
-        "newsletter": "미표기",
-        "summary": "CQ0465L/R 부품 구매를 위한 미국 내 소매업체 문의",
-        "action": "영업팀 연락 필요"
-      },
-      {
-        "datetime": "2026-04-06 13:00 (KST)",
-        "region": "etc",
-        "country": "Korea (Bolivia 관련)",
-        "name": "조용운",
-        "email": "mcho@kebsrl.com",
-        "phone": "+59163442013",
-        "type": "purchase",
-        "newsletter": "Y",
-        "summary": "볼리비아 자동차 부품 유통업체(KEBSRL) 대표 Michel Dabdoub의 미팅 요청 (4월9일까지 한국 체류)",
-        "action": "영업팀 연락 필요"
-      },
-      {
-        "datetime": "2026-04-07 14:57 (KST)",
-        "region": "etc",
-        "country": "Korea (China)",
-        "name": "Irene (GJBUSH)",
-        "email": "sales03@gjbush.com",
-        "phone": "13617914001",
-        "type": "other",
-        "newsletter": "Y",
-        "summary": "중국 고무 부싱 제조업체 GJBUSH의 OEM 부품 공급 협력 제안",
-        "action": "담당자 검토 필요"
-      },
-      {
-        "datetime": "2026-04-09 15:36 (KST)",
-        "region": "af",
-        "country": "Israel",
-        "name": "Erez Maman",
-        "email": "erezmaman7@gmail.com",
-        "phone": "+972506708963",
-        "type": "purchase",
-        "newsletter": "N",
-        "summary": "이스라엘 내 CTR 유통업체/현지 대리점 문의, 없으면 직접 구매 희망",
-        "action": "영업팀 연락 필요"
-      },
-      {
-        "datetime": "2026-04-09 17:32 (KST)",
-        "region": "eu",
-        "country": "Poland",
-        "name": "Dorota Neumann-Mueller",
-        "email": "dorota.neumann-muller@logisticsplus.com",
-        "phone": "0048798492336",
-        "type": "other",
-        "newsletter": "Y",
-        "summary": "Logistics Plus Poland의 물류 협력 파트너십 제안",
-        "action": "담당자 검토 필요"
-      },
-      {
-        "datetime": "2026-04-09 18:34 (KST)",
-        "region": "etc",
-        "country": "Korea (Mozambique)",
-        "name": "Cadeto Vicente Come",
-        "email": "cadetocome@mozcontinental.co.mz",
-        "phone": "+258840495072",
-        "type": "purchase",
-        "newsletter": "Y",
-        "summary": "모잠비크 자동차 부품 판매 업체로 서스펜션·스티어링 부품 공급업체 및 포트폴리오 요청",
-        "action": "영업팀 연락 필요"
-      },
-      {
-        "datetime": "2026-04-13 21:32 (KST)",
-        "region": "etc",
-        "country": "Korea",
-        "name": "ED",
-        "email": "mund2@op.pl",
-        "phone": "598771062",
-        "type": "parts",
-        "newsletter": "Y",
-        "summary": "Kia Xceed 리어 로어 컨트롤 암 부싱(OE 55230F2AA)에 CTR GV0322 호환 여부 확인",
-        "action": "제품 정보 안내 필요"
-      },
-      {
-        "datetime": "2026-04-15 23:29 (KST)",
-        "region": "na",
-        "country": "United States",
-        "name": "DENZEL",
-        "email": "denzelhayes96@gmail.com",
-        "phone": "8327632637",
-        "type": "purchase",
-        "newsletter": "Y",
-        "summary": "타이로드 등 부품 주문 방법 문의",
-        "action": "영업팀 연락 필요"
-      },
-      {
-        "datetime": "2026-04-16 16:54 (KST)",
-        "region": "ru",
-        "country": "Russia",
-        "name": "Юрий",
-        "email": "ovdei71@yandex.ru",
-        "phone": "+79306808493",
-        "type": "parts",
-        "newsletter": "Y",
-        "summary": "Chery Tiggo 8 Pro Max 2022 전후방 스태빌라이저 링크 하이브리드/일반 부품 번호(PL0579/CL0579/CL0049) 확인 요청",
-        "action": "제품 정보 안내 필요"
-      },
-      {
-        "datetime": "2026-04-16 18:16 (KST)",
-        "region": "af",
-        "country": "UAE",
-        "name": "TWO STEP",
-        "email": "twostep859@gmail.com",
-        "phone": "0562055521",
-        "type": "purchase",
-        "newsletter": "Y",
-        "summary": "차량 부품 구매 문의 (NEED PARTS)",
-        "action": "영업팀 연락 필요"
-      },
-      {
-        "datetime": "2026-04-17 19:26 (KST)",
-        "region": "cis",
-        "country": "Turkmenistan",
-        "name": "Astanow Azat",
-        "email": "0306nnbonus@gmail.com",
-        "phone": "+99365357946",
-        "type": "parts",
-        "newsletter": "Y",
-        "summary": "CTR 제품에 관심, 중국 공장 연락처 문의",
-        "action": "제품 정보 안내 필요"
-      },
-      {
-        "datetime": "2026-04-18 12:12 (KST)",
-        "region": "na",
-        "country": "Canada",
-        "name": "Daljeet",
-        "email": "msdaljeet@yahoo.co.in",
-        "phone": "6047497009",
-        "type": "parts",
-        "newsletter": "Y",
-        "summary": "부품 목록 상세 정보 요청",
-        "action": "제품 정보 안내 필요"
-      },
-      {
-        "datetime": "2026-04-18 12:12 (KST)",
-        "region": "na",
-        "country": "Canada",
-        "name": "Daljeet",
-        "email": "msdaljeet@yahoo.co.in",
-        "phone": "6047497009",
-        "type": "parts",
-        "newsletter": "Y",
-        "summary": "부품 목록 상세 정보 요청 (중복 제출)",
-        "action": "제품 정보 안내 필요"
-      },
-      {
-        "datetime": "2026-04-19 04:30 (KST)",
-        "region": "latam",
-        "country": "Ecuador",
-        "name": "Angel Valarezo Ruiz",
-        "email": "angelvalarezo@yahoo.com",
-        "phone": "593 984810508",
-        "type": "price",
-        "newsletter": "Y",
-        "summary": "CTR 브레이크 패드 수입 관심, 카탈로그 및 가격 정보 요청",
-        "action": "견적서 발송 필요"
-      },
-      {
-        "datetime": "2026-04-19 17:08 (KST)",
-        "region": "cis",
-        "country": "Kyrgyzstan",
-        "name": "Yahyobek",
-        "email": "a70844002@gmail.com",
-        "phone": "+996990059090",
-        "type": "complaint",
-        "newsletter": "Y",
-        "summary": "클레임 접수 (메시지: 'Привет' - 실질적 내용 없음)",
-        "action": "CS팀 즉시 대응 필요"
-      },
-      {
-        "datetime": "2026-04-19 17:09 (KST)",
-        "region": "cis",
-        "country": "Kyrgyzstan",
-        "name": "Yahyobek",
-        "email": "a70844002@gmail.com",
-        "phone": "+996990059090",
-        "type": "empty",
-        "newsletter": "Y",
-        "summary": "내용 없는 문의 (메시지: 'Привет' - 안녕)",
-        "action": "내용 확인 후 회신 필요"
-      },
-      {
-        "datetime": "2026-04-19 17:18 (KST)",
-        "region": "cis",
-        "country": "Kyrgyzstan",
-        "name": "Irbis",
-        "email": "itikulov.irbis@yandex.com",
-        "phone": "+996700135740",
-        "type": "purchase",
-        "newsletter": "Y",
-        "summary": "CTR와 협력/유통 관계 희망 (WhatsApp: +996700135740)",
-        "action": "영업팀 연락 필요"
-      },
-      {
-        "datetime": "2026-04-19 17:18 (KST)",
-        "region": "cis",
-        "country": "Kyrgyzstan",
-        "name": "Irbis",
-        "email": "itikulov.irbis@yandex.com",
-        "phone": "+996700135740",
-        "type": "purchase",
-        "newsletter": "Y",
-        "summary": "CTR와 협력/유통 관계 희망 (중복 제출)",
-        "action": "영업팀 연락 필요"
-      },
-      {
-        "datetime": "2026-04-20 09:46 (KST)",
-        "region": "na",
-        "country": "United States",
-        "name": "Diego Campiño",
-        "email": "ecomautomia@gmail.com",
-        "phone": "+13052009609",
-        "type": "parts",
-        "newsletter": "Y",
-        "summary": "서스펜션 및 스티어링 부품에 관심 표명",
-        "action": "제품 정보 안내 필요"
-      },
-      {
-        "datetime": "2026-04-21 17:16 (KST)",
-        "region": "etc",
-        "country": "Korea (Tajikistan)",
-        "name": "komron",
-        "email": "safarov.konron@bk.ru",
-        "phone": "+992557700100",
-        "type": "price",
-        "newsletter": "Y",
-        "summary": "가격 문의 ('haw much') - 간단한 가격 문의",
-        "action": "견적서 발송 필요"
-      },
-      {
-        "datetime": "2026-04-21 17:16 (KST)",
-        "region": "etc",
-        "country": "Korea (Tajikistan)",
-        "name": "komron",
-        "email": "safarov.konron@bk.ru",
-        "phone": "+992557700100",
-        "type": "price",
-        "newsletter": "Y",
-        "summary": "가격 문의 (중복 제출 #2)",
-        "action": "견적서 발송 필요"
-      },
-      {
-        "datetime": "2026-04-21 17:16 (KST)",
-        "region": "etc",
-        "country": "Korea (Tajikistan)",
-        "name": "komron",
-        "email": "safarov.konron@bk.ru",
-        "phone": "+992557700100",
-        "type": "price",
-        "newsletter": "Y",
-        "summary": "가격 문의 (중복 제출 #3)",
-        "action": "견적서 발송 필요"
-      },
-      {
-        "datetime": "2026-04-22 19:38 (KST)",
-        "region": "eu",
-        "country": "Ukraine",
-        "name": "Михайло Пюрковський",
-        "email": "mihailpurkovskij@gmail.com",
-        "phone": "+380970769427",
-        "type": "parts",
-        "newsletter": "Y",
-        "summary": "Opel Astra H 2007 1.6 해치백 브레이크 패드(Тормозные колодки) 검색 문의",
-        "action": "제품 정보 안내 필요"
-      }
-    ]
-  }
-};
+const ALL_MONTHLY_DATA = {"2026-04": {"label": "2026년 04월", "total": 30, "nlY": 26, "typeCounts": {"parts": 8, "purchase": 13, "price": 4, "technical": 0, "complaint": 1, "empty": 1, "other": 3}, "regionCounts": {"na": 6, "latam": 3, "eu": 2, "sea": 0, "af": 4, "cis": 7, "ru": 1, "etc": 7}, "regionNL": {"na": 4, "latam": 2, "eu": 2, "sea": 0, "af": 3, "cis": 7, "ru": 1, "etc": 7}, "regionNL_N": {"na": 0, "latam": 1, "eu": 0, "sea": 0, "af": 1, "cis": 0, "ru": 0, "etc": 0}, "regionNL_Blank": {"na": 2, "latam": 0, "eu": 0, "sea": 0, "af": 0, "cis": 0, "ru": 0, "etc": 0}, "regionTypeCounts": {"na": {"parts": 3, "purchase": 3, "price": 0, "technical": 0, "complaint": 0, "empty": 0, "other": 0}, "latam": {"parts": 0, "purchase": 2, "price": 1, "technical": 0, "complaint": 0, "empty": 0, "other": 0}, "eu": {"parts": 1, "purchase": 0, "price": 0, "technical": 0, "complaint": 0, "empty": 0, "other": 1}, "sea": {"parts": 0, "purchase": 0, "price": 0, "technical": 0, "complaint": 0, "empty": 0, "other": 0}, "af": {"parts": 0, "purchase": 3, "price": 0, "technical": 0, "complaint": 0, "empty": 0, "other": 1}, "cis": {"parts": 2, "purchase": 3, "price": 0, "technical": 0, "complaint": 1, "empty": 1, "other": 0}, "ru": {"parts": 1, "purchase": 0, "price": 0, "technical": 0, "complaint": 0, "empty": 0, "other": 0}, "etc": {"parts": 1, "purchase": 2, "price": 3, "technical": 0, "complaint": 0, "empty": 0, "other": 1}}, "emails": [{"datetime": "2026-04-02 00:40 (KST)", "region": "latam", "country": "Mexico", "name": "Antonio Vazquez", "email": "", "phone": "", "type": "purchase", "newsletter": "N", "summary": "AAPEX Vegas에서 CTR 브랜드 인지, 멕시코 도매업체로 제품 구매 희망", "action": "영업팀 연락 필요"}, {"datetime": "2026-04-02 20:33 (KST)", "region": "af", "country": "South Africa", "name": "Ethan Mayer", "email": "", "phone": "", "type": "other", "newsletter": "Y", "summary": "Auto Industrial Review Africa 2026 특별판 광고 게재 제안", "action": "담당자 검토 필요"}, {"datetime": "2026-04-03 03:21 (KST)", "region": "na", "country": "United States", "name": "Mitch", "email": "", "phone": "", "type": "purchase", "newsletter": "미표기", "summary": "CQ0465L/R 부품 구매를 위한 미국 내 소매업체 문의 (중복 제출)", "action": "영업팀 연락 필요"}, {"datetime": "2026-04-03 03:22 (KST)", "region": "na", "country": "United States", "name": "Mitch", "email": "", "phone": "", "type": "purchase", "newsletter": "미표기", "summary": "CQ0465L/R 부품 구매를 위한 미국 내 소매업체 문의", "action": "영업팀 연락 필요"}, {"datetime": "2026-04-06 13:00 (KST)", "region": "etc", "country": "Korea (Bolivia 관련)", "name": "조용운", "email": "", "phone": "", "type": "purchase", "newsletter": "Y", "summary": "볼리비아 자동차 부품 유통업체(KEBSRL) 대표 Michel Dabdoub의 미팅 요청", "action": "영업팀 연락 필요"}, {"datetime": "2026-04-07 14:57 (KST)", "region": "etc", "country": "Korea (China)", "name": "Irene (GJBUSH)", "email": "", "phone": "", "type": "other", "newsletter": "Y", "summary": "중국 고무 부싱 제조업체 GJBUSH의 OEM 부품 공급 협력 제안", "action": "담당자 검토 필요"}, {"datetime": "2026-04-09 15:36 (KST)", "region": "af", "country": "Israel", "name": "Erez Maman", "email": "", "phone": "", "type": "purchase", "newsletter": "N", "summary": "이스라엘 내 CTR 유통업체/현지 대리점 문의, 없으면 직접 구매 희망", "action": "영업팀 연락 필요"}, {"datetime": "2026-04-09 17:32 (KST)", "region": "eu", "country": "Poland", "name": "Dorota Neumann-Mueller", "email": "", "phone": "", "type": "other", "newsletter": "Y", "summary": "Logistics Plus Poland의 물류 협력 파트너십 제안", "action": "담당자 검토 필요"}, {"datetime": "2026-04-09 18:34 (KST)", "region": "etc", "country": "Korea (Mozambique)", "name": "Cadeto Vicente Come", "email": "", "phone": "", "type": "purchase", "newsletter": "Y", "summary": "모잠비크 자동차 부품 판매 업체로 서스펜션·스티어링 부품 공급업체 및 포트폴리오 요청", "action": "영업팀 연락 필요"}, {"datetime": "2026-04-13 21:32 (KST)", "region": "etc", "country": "Korea", "name": "ED", "email": "", "phone": "", "type": "parts", "newsletter": "Y", "summary": "Kia Xceed 리어 로어 컨트롤 암 부싱(OE 55230F2AA)에 CTR GV0322 호환 여부 확인", "action": "제품 정보 안내 필요"}, {"datetime": "2026-04-15 23:29 (KST)", "region": "na", "country": "United States", "name": "DENZEL", "email": "", "phone": "", "type": "purchase", "newsletter": "Y", "summary": "타이로드 등 부품 주문 방법 문의", "action": "영업팀 연락 필요"}, {"datetime": "2026-04-16 16:54 (KST)", "region": "ru", "country": "Russia", "name": "Юрий", "email": "", "phone": "", "type": "parts", "newsletter": "Y", "summary": "Chery Tiggo 8 Pro Max 2022 전후방 스태빌라이저 링크 하이브리드/일반 부품 번호(PL05) 문의", "action": "제품 정보 안내 필요"}, {"datetime": "2026-04-16 18:16 (KST)", "region": "af", "country": "UAE", "name": "TWO STEP", "email": "", "phone": "", "type": "purchase", "newsletter": "Y", "summary": "차량 부품 구매 문의 (NEED PARTS)", "action": "영업팀 연락 필요"}, {"datetime": "2026-04-17 19:26 (KST)", "region": "cis", "country": "Turkmenistan", "name": "Astanow Azat", "email": "", "phone": "", "type": "parts", "newsletter": "Y", "summary": "CTR 제품에 관심, 중국 공장 연락처 문의", "action": "제품 정보 안내 필요"}, {"datetime": "2026-04-18 12:12 (KST)", "region": "na", "country": "Canada", "name": "Daljeet", "email": "", "phone": "", "type": "parts", "newsletter": "Y", "summary": "부품 목록 상세 정보 요청", "action": "제품 정보 안내 필요"}, {"datetime": "2026-04-18 12:12 (KST)", "region": "na", "country": "Canada", "name": "Daljeet", "email": "", "phone": "", "type": "parts", "newsletter": "Y", "summary": "부품 목록 상세 정보 요청 (중복 제출)", "action": "제품 정보 안내 필요"}, {"datetime": "2026-04-19 04:30 (KST)", "region": "latam", "country": "Ecuador", "name": "Angel Valarezo Ruiz", "email": "", "phone": "", "type": "price", "newsletter": "Y", "summary": "CTR 브레이크 패드 수입 관심, 카탈로그 및 가격 정보 요청", "action": "견적서 발송 필요"}, {"datetime": "2026-04-19 17:08 (KST)", "region": "cis", "country": "Kyrgyzstan", "name": "Yahyobek", "email": "", "phone": "", "type": "complaint", "newsletter": "Y", "summary": "클레임 접수 (메시지: 'Привет' - 실질적 내용 없음)", "action": "CS팀 즉시 대응 필요"}, {"datetime": "2026-04-19 17:09 (KST)", "region": "cis", "country": "Kyrgyzstan", "name": "Yahyobek", "email": "", "phone": "", "type": "empty", "newsletter": "Y", "summary": "내용 없는 문의 (메시지: 'Привет' - 안녕)", "action": "내용 확인 후 회신 필요"}, {"datetime": "2026-04-19 17:18 (KST)", "region": "cis", "country": "Kyrgyzstan", "name": "Irbis", "email": "", "phone": "", "type": "purchase", "newsletter": "Y", "summary": "CTR와 협력/유통 관계 희망 (WhatsApp: +996700135740)", "action": "영업팀 연락 필요"}, {"datetime": "2026-04-19 17:18 (KST)", "region": "cis", "country": "Kyrgyzstan", "name": "Irbis", "email": "", "phone": "", "type": "purchase", "newsletter": "Y", "summary": "CTR와 협력/유통 관계 희망 (중복 제출)", "action": "영업팀 연락 필요"}, {"datetime": "2026-04-20 09:46 (KST)", "region": "na", "country": "United States", "name": "Diego Campiño", "email": "", "phone": "", "type": "parts", "newsletter": "Y", "summary": "서스펜션 및 스티어링 부품에 관심 표명", "action": "제품 정보 안내 필요"}, {"datetime": "2026-04-21 17:16 (KST)", "region": "etc", "country": "Korea (Tajikistan)", "name": "komron", "email": "", "phone": "", "type": "price", "newsletter": "Y", "summary": "가격 문의 ('haw much') - 간단한 가격 문의", "action": "견적서 발송 필요"}, {"datetime": "2026-04-21 17:16 (KST)", "region": "etc", "country": "Korea (Tajikistan)", "name": "komron", "email": "", "phone": "", "type": "price", "newsletter": "Y", "summary": "가격 문의 (중복 제출 #2)", "action": "견적서 발송 필요"}, {"datetime": "2026-04-21 17:16 (KST)", "region": "etc", "country": "Korea (Tajikistan)", "name": "komron", "email": "", "phone": "", "type": "price", "newsletter": "Y", "summary": "가격 문의 (중복 제출 #3)", "action": "견적서 발송 필요"}, {"datetime": "2026-04-22 19:38 (KST)", "region": "eu", "country": "Ukraine", "name": "Михайло Пюрковський", "email": "", "phone": "", "type": "parts", "newsletter": "Y", "summary": "Opel Astra H 2007 1.6 해치백 브레이크 패드(Тормозные колодки) 검색 문의", "action": "제품 정보 안내 필요"}, {"datetime": "2026-04-23 14:15 (KST)", "region": "cis", "country": "Turkmenistan", "name": "Azat", "email": "0306nnbonus@gmail.com", "phone": "+99365357946", "type": "parts", "newsletter": "Y", "summary": "CTR 연락처(전화번호) 문의 (중국 공장 번호 요청)", "action": "제품 정보 안내 필요"}, {"datetime": "2026-04-23 20:59 (KST)", "region": "af", "country": "Iraq", "name": "PAIMAN MOHAMMED FARAJ", "email": "awat.kiara@gmail.com", "phone": "+9647702495506", "type": "purchase", "newsletter": "Y", "summary": "이라크·쿠르디스탄 CTR 서스펜션·스티어링 부품 유통 파트너십 문의, 카탈로그·가격·MOQ 요청", "action": "영업팀 연락 필요"}, {"datetime": "2026-04-24 02:06 (KST)", "region": "cis", "country": "Turkmenistan", "name": "Azat", "email": "0306nnbonus@gmail.com", "phone": "+99365357946", "type": "purchase", "newsletter": "Y", "summary": "주문 방법 문의 (클레임으로 접수, 실제 구매 의향)", "action": "영업팀 연락 필요"}, {"datetime": "2026-04-24 04:23 (KST)", "region": "latam", "country": "Costa Rica", "name": "John Flores", "email": "rapcompras01@gmail.com", "phone": "84268619", "type": "purchase", "newsletter": "Y", "summary": "Auto Repuestos Guadalupe(코스타리카) - CTR 서스펜션·쇼크압소버 도매 공급 요청, 가격표·MOQ·수출조건 문의", "action": "영업팀 연락 필요"}]}};
 // __DATA_END__
 
-// Config
-const REGION_CONFIG = {
-  na:    { label: '북미',   color: '#2563EB', countries: 'USA, Canada' },
-  latam: { label: '중남미', color: '#DC2626', countries: 'Mexico, Brazil, Ecuador...' },
-  eu:    { label: '유럽',   color: '#EA580C', countries: 'UK, Germany, Poland...' },
-  sea:   { label: '동남아', color: '#16A34A', countries: 'Thailand, Vietnam...' },
-  af:    { label: '아·중동',color: '#7C3AED', countries: 'Africa, UAE, Saudi...' },
-  cis:   { label: 'CIS',    color: '#0891B2', countries: 'Kazakhstan, Kyrgyzstan...' },
-  ru:    { label: '러시아', color: '#65A30D', countries: 'Russia' },
-  etc:   { label: '기타',   color: '#6B7280', countries: 'Korea, India...' },
-};
-const TYPE_CONFIG = {
-  parts:     { label: '부품 정보',  color: '#0EA5E9' },
-  purchase:  { label: '구매/주문', color: '#10B981' },
-  price:     { label: '가격/견적', color: '#F59E0B' },
-  technical: { label: '기술 지원', color: '#8B5CF6' },
-  complaint: { label: '불만/A·S', color: '#EF4444' },
-  empty:     { label: '내용 없음', color: '#9CA3AF' },
-  other:     { label: '기타',      color: '#6B7280' },
-};
-const NL_COLOR = { 'Y': '#10B981', 'N': '#EF4444', '미표기': '#9CA3AF' };
-const ACTION_COLOR = {
-  '영업팀 연락 필요': '#10B981', '견적서 발송 필요': '#F59E0B',
-  '제품 정보 안내 필요': '#0EA5E9', '기술팀 이관 필요': '#8B5CF6',
-  'CS팀 즉시 대응 필요': '#EF4444', '내용 확인 후 회신 필요': '#9CA3AF',
-  '마케팅 DB 추가 필요': '#EC4899', '담당자 검토 필요': '#6B7280',
-};
+const REGION_COLORS={na:'#2563EB',latam:'#DC2626',eu:'#EA580C',sea:'#16A34A',af:'#7C3AED',cis:'#0891B2',ru:'#65A30D',etc:'#6B7280'};
+const REGION_NAMES={na:'북미',latam:'중남미',eu:'유럽',sea:'동남아',af:'아중동',cis:'CIS',ru:'러시아',etc:'기타'};
+const TYPE_COLORS={parts:'#0EA5E9',purchase:'#10B981',price:'#F59E0B',technical:'#8B5CF6',complaint:'#EF4444',empty:'#9CA3AF',other:'#6B7280'};
+const TYPE_NAMES={parts:'부품 정보',purchase:'구매/주문',price:'가격/견적',technical:'기술 지원',complaint:'불만/A·S',empty:'내용 없음',other:'기타'};
+const REGIONS=['na','latam','eu','sea','af','cis','ru','etc'];
+const TYPES=['parts','purchase','price','technical','complaint','empty','other'];
 
-let currentYM = '';
-let selectedRegion = 'all';
-let barChart, donutChart, trendChart;
+let currentYM='',currentRegion='all';
+let barChart=null,donutChart=null,trendChart=null;
 
-// Build navigator
-function buildNav() {
-  const navWrap = document.getElementById('navWrap');
-  const keys = Object.keys(ALL_MONTHLY_DATA).sort();
-  const years = [...new Set(keys.map(k => k.split('-')[0]))];
-  navWrap.innerHTML = '';
-  years.forEach(y => {
-    const ytab = document.createElement('span');
-    ytab.className = 'year-tab';
-    ytab.textContent = y + '년';
-    ytab.dataset.year = y;
-    ytab.onclick = () => renderTrendChart(y);
-    navWrap.appendChild(ytab);
-    const monthsOfYear = keys.filter(k => k.startsWith(y));
-    monthsOfYear.forEach(ym => {
-      const d = ALL_MONTHLY_DATA[ym];
-      const mb = document.createElement('button');
-      mb.className = 'month-btn';
-      mb.textContent = ym.split('-')[1] + '월';
-      mb.dataset.ym = ym;
-      mb.onclick = () => loadMonth(ym);
-      navWrap.appendChild(mb);
-    });
-  });
-  // Select latest
-  const latest = keys[keys.length - 1];
-  loadMonth(latest);
-  const ly = latest.split('-')[0];
-  document.querySelectorAll('.year-tab').forEach(t => {
-    t.classList.toggle('active', t.dataset.year === ly);
-  });
-  renderTrendChart(ly);
+function getAllYears(){
+  const years=new Set();
+  Object.keys(ALL_MONTHLY_DATA).forEach(k=>years.add(k.split('-')[0]));
+  return [...years].sort();
 }
 
-function loadMonth(ym) {
-  currentYM = ym;
-  selectedRegion = 'all';
-  document.querySelectorAll('.month-btn').forEach(b => b.classList.toggle('active', b.dataset.ym === ym));
-  const d = ALL_MONTHLY_DATA[ym];
-  const [y, m] = ym.split('-');
-  document.getElementById('monthTitle').textContent = y + '년 ' + m + '월 요약';
-  renderSummary(d);
-  renderRegionGrid(d);
-  renderTabs(d);
-  renderEmailCards(d, 'all');
-  renderTable(d, 'all');
+function getMonthsForYear(year){
+  return Object.keys(ALL_MONTHLY_DATA).filter(k=>k.startsWith(year)).sort();
 }
 
-function renderSummary(d) {
-  document.getElementById('kpiTotal').textContent = d.total + '건';
-  document.getElementById('kpiSub').textContent = '당월 총 접수';
-  document.getElementById('kpiNL').textContent = d.nlY + '건';
-  document.getElementById('kpiNLSub').textContent = '동의율 ' + Math.round(d.nlY/d.total*100) + '%';
-  // Type progress
-  const tp = document.getElementById('typeProgress');
-  tp.innerHTML = '';
-  const max = Math.max(...Object.values(d.typeCounts), 1);
-  Object.entries(TYPE_CONFIG).forEach(([k, cfg]) => {
-    const cnt = d.typeCounts[k] || 0;
-    if (cnt === 0) return;
-    tp.innerHTML += `<div class="prog-row">
-      <span class="prog-label">${cfg.label}</span>
-      <div class="prog-bar-wrap"><div class="prog-bar" style="width:${Math.round(cnt/max*100)}%;background:${cfg.color}"></div></div>
-      <span class="prog-count">${cnt}</span>
-    </div>`;
+function initNav(){
+  const years=getAllYears();
+  const yearTabs=document.getElementById('year-tabs');
+  const monthBtns=document.getElementById('month-btns');
+  
+  const latestYM=Object.keys(ALL_MONTHLY_DATA).sort().pop();
+  const latestYear=latestYM.split('-')[0];
+
+  years.forEach(y=>{
+    const btn=document.createElement('button');
+    btn.className='year-tab'+(y===latestYear?' active':'');
+    btn.textContent=y+'년';
+    btn.onclick=()=>{
+      document.querySelectorAll('.year-tab').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      renderMonthBtns(y);
+    };
+    yearTabs.appendChild(btn);
   });
+  renderMonthBtns(latestYear);
+  loadMonth(latestYM);
+}
+
+function renderMonthBtns(year){
+  const monthBtns=document.getElementById('month-btns');
+  monthBtns.innerHTML='';
+  getMonthsForYear(year).forEach(ym=>{
+    const m=ym.split('-')[1];
+    const btn=document.createElement('button');
+    btn.className='month-btn'+(ym===currentYM?' active':'');
+    btn.textContent=m+'월';
+    btn.id='mbtn-'+ym;
+    btn.onclick=()=>loadMonth(ym);
+    monthBtns.appendChild(btn);
+  });
+}
+
+function loadMonth(ym){
+  currentYM=ym;
+  currentRegion='all';
+  document.querySelectorAll('.month-btn').forEach(b=>b.classList.remove('active'));
+  const mb=document.getElementById('mbtn-'+ym);
+  if(mb)mb.classList.add('active');
+  
+  const d=ALL_MONTHLY_DATA[ym];
+  if(!d)return;
+  
+  updateKPIs(d,'all');
+  renderTypeBars(d,'all');
   renderBarChart(d);
-  renderDonutChart(d);
+  renderDonutChart(d,'all');
+  renderTrendChart(ym.split('-')[0]);
+  renderRegionGrid(d);
+  renderEmailCards(d,'all');
+  renderTable(d,'all');
 }
 
-function getFilteredData(d, region) {
-  if (region === 'all') return d;
-  const emails = d.emails.filter(e => e.region === region);
-  const typeCounts = {};
-  Object.keys(TYPE_CONFIG).forEach(t => { typeCounts[t] = emails.filter(e => e.type === t).length; });
-  return { ...d, emails, total: emails.length, nlY: emails.filter(e=>e.newsletter==='Y').length, typeCounts };
+function updateKPIs(d,region){
+  let total,nlY,nlLabel,nlSub,regionSub;
+  if(region==='all'){
+    total=d.total; nlY=d.nlY;
+    regionSub='전체 지역';
+    nlLabel=`동의율 ${Math.round(nlY/total*100)}%`;
+    nlSub=`미동의 ${d.total-d.nlY}건`;
+  } else {
+    total=d.regionCounts[region]||0;
+    nlY=d.regionNL[region]||0;
+    regionSub=REGION_NAMES[region]+' 필터 적용 중';
+    nlLabel=total>0?`동의율 ${Math.round(nlY/total*100)}%`:'데이터 없음';
+    nlSub=`미동의 ${(d.regionNL_N[region]||0)}건 / 미표기 ${(d.regionNL_Blank[region]||0)}건`;
+  }
+  document.getElementById('kpi-total').textContent=total+'건';
+  document.getElementById('kpi-month-label').textContent=d.label;
+  document.getElementById('kpi-region-sub').textContent=regionSub;
+  document.getElementById('kpi-nl').textContent=nlY+'건';
+  document.getElementById('kpi-nl-label').textContent=nlLabel;
+  document.getElementById('kpi-nl-sub').textContent=nlSub;
 }
 
-function renderBarChart(d) {
-  const ctx = document.getElementById('barChart');
-  if (barChart) barChart.destroy();
-  const labels = Object.keys(REGION_CONFIG).map(r => REGION_CONFIG[r].label);
-  const values = Object.keys(REGION_CONFIG).map(r => d.regionCounts[r] || 0);
-  const colors = Object.keys(REGION_CONFIG).map(r => REGION_CONFIG[r].color);
-  barChart = new Chart(ctx, {
-    type: 'bar',
-    data: { labels, datasets: [{ data: values, backgroundColor: colors, borderRadius: 6 }] },
-    options: {
-      responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } }, x: { ticks: { font: { size: 11 } } } },
-      onClick: (e, el) => {
-        if (el.length) {
-          const idx = el[0].index;
-          const region = Object.keys(REGION_CONFIG)[idx];
-          toggleRegion(region);
-        }
+function renderTypeBars(d,region){
+  const wrap=document.getElementById('type-bars');
+  wrap.innerHTML='';
+  let counts;
+  if(region==='all') counts=d.typeCounts;
+  else counts=d.regionTypeCounts[region]||{};
+  const total=Object.values(counts).reduce((a,b)=>a+b,0)||1;
+  TYPES.forEach(t=>{
+    const c=counts[t]||0;
+    if(region==='all'||c>0){
+      const pct=Math.round(c/total*100);
+      wrap.innerHTML+=`<div class="type-row">
+        <span class="type-name">${TYPE_NAMES[t]}</span>
+        <div class="type-bar-wrap"><div class="type-bar" style="width:${pct}%;background:${TYPE_COLORS[t]}"></div></div>
+        <span class="type-count">${c}</span>
+      </div>`;
+    }
+  });
+}
+
+function renderBarChart(d){
+  if(barChart){barChart.destroy();barChart=null;}
+  const ctx=document.getElementById('bar-chart').getContext('2d');
+  barChart=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:REGIONS.map(r=>REGION_NAMES[r]),
+      datasets:[{
+        label:'문의 건수',
+        data:REGIONS.map(r=>d.regionCounts[r]||0),
+        backgroundColor:REGIONS.map(r=>REGION_COLORS[r]+'cc'),
+        borderColor:REGIONS.map(r=>REGION_COLORS[r]),
+        borderWidth:1,borderRadius:6
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{y:{beginAtZero:true,ticks:{stepSize:1},grid:{color:'rgba(128,128,128,.15)'}},x:{grid:{display:false}}},
+      onClick:(e,els)=>{
+        if(els.length){const r=REGIONS[els[0].index];toggleRegion(r);}
       }
     }
   });
 }
 
-function renderDonutChart(d) {
-  const ctx = document.getElementById('donutChart');
-  if (donutChart) donutChart.destroy();
-  const fd = getFilteredData(d, selectedRegion);
-  const total = fd.emails.length;
-  const nlY = fd.emails.filter(e=>e.newsletter==='Y').length;
-  const nlN = fd.emails.filter(e=>e.newsletter==='N').length;
-  const nlB = total - nlY - nlN;
-  donutChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: { labels: ['동의(Y)', '미동의(N)', '미표기'], datasets: [{ data: [nlY, nlN, nlB], backgroundColor: ['#10B981','#EF4444','#9CA3AF'], borderWidth: 2 }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } } }
-  });
-}
-
-function renderTrendChart(year) {
-  document.querySelectorAll('.year-tab').forEach(t => t.classList.toggle('active', t.dataset.year === year));
-  const ctx = document.getElementById('trendChart');
-  if (trendChart) trendChart.destroy();
-  const months = ['01','02','03','04','05','06','07','08','09','10','11','12'];
-  const labels = months.map(m => m + '월');
-  const values = months.map(m => (ALL_MONTHLY_DATA[year+'-'+m] || {}).total || 0);
-  const pointColors = months.map(m => (year+'-'+m === currentYM) ? '#e42526' : '#2563EB');
-  const pointSizes = months.map(m => (year+'-'+m === currentYM) ? 8 : 4);
-  trendChart = new Chart(ctx, {
-    type: 'line',
-    data: { labels, datasets: [{ data: values, borderColor: '#2563EB', backgroundColor: 'rgba(37,99,235,.1)', fill: true, tension: .4, pointBackgroundColor: pointColors, pointRadius: pointSizes, pointHoverRadius: 8 }] },
-    options: {
-      responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
-      scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
-      onClick: (e, el) => {
-        if (el.length) {
-          const mi = el[0].index;
-          const ym = year + '-' + months[mi];
-          if (ALL_MONTHLY_DATA[ym]) loadMonth(ym);
-        }
-      }
+function renderDonutChart(d,region){
+  if(donutChart){donutChart.destroy();donutChart=null;}
+  const ctx=document.getElementById('donut-chart').getContext('2d');
+  let nlY,nlN,nlB,total;
+  if(region==='all'){
+    total=d.total; nlY=d.nlY;
+    nlN=Object.values(d.regionNL_N).reduce((a,b)=>a+b,0);
+    nlB=total-nlY-nlN;
+  } else {
+    nlY=d.regionNL[region]||0;
+    nlN=d.regionNL_N[region]||0;
+    nlB=d.regionNL_Blank[region]||0;
+    total=nlY+nlN+nlB;
+  }
+  donutChart=new Chart(ctx,{
+    type:'doughnut',
+    data:{
+      labels:['동의(Y)','미동의(N)','미표기'],
+      datasets:[{data:[nlY,nlN,nlB],backgroundColor:['#10B981','#EF4444','#9CA3AF'],borderWidth:2}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
+      plugins:{legend:{position:'bottom',labels:{font:{size:11}}}}
     }
   });
 }
 
-function renderRegionGrid(d) {
-  const grid = document.getElementById('regionGrid');
-  grid.innerHTML = '';
-  Object.entries(REGION_CONFIG).forEach(([r, cfg]) => {
-    const cnt = d.regionCounts[r] || 0;
-    const nlY = d.regionNL[r] || 0;
-    const div = document.createElement('div');
-    div.className = 'card region-kpi' + (selectedRegion === r ? ' selected' : '');
-    div.onclick = () => toggleRegion(r);
-    div.innerHTML = `
-      <div class="r-name"><span class="r-badge" style="background:${cfg.color}"></span>${cfg.label}</div>
-      <div class="r-count" style="color:${cfg.color}">${cnt}</div>
-      <div class="r-nl">NL: ${nlY}/${cnt}</div>`;
+function renderTrendChart(year){
+  if(trendChart){trendChart.destroy();trendChart=null;}
+  const months=getMonthsForYear(year);
+  const ctx=document.getElementById('trend-chart').getContext('2d');
+  const colors=months.map(m=>m===currentYM?'#e42526':'#3b82f6');
+  const ptSizes=months.map(m=>m===currentYM?8:4);
+  trendChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:months.map(m=>m.split('-')[1]+'월'),
+      datasets:[{
+        label:'월별 문의',
+        data:months.map(m=>ALL_MONTHLY_DATA[m]?.total||0),
+        borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.1)',
+        fill:true,tension:.3,
+        pointBackgroundColor:colors,pointRadius:ptSizes,pointHoverRadius:8
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{y:{beginAtZero:true,ticks:{stepSize:1},grid:{color:'rgba(128,128,128,.15)'}},x:{grid:{display:false}}},
+      onClick:(e,els)=>{if(els.length)loadMonth(months[els[0].index]);}
+    }
+  });
+}
+
+function renderRegionGrid(d){
+  const grid=document.getElementById('region-grid');
+  grid.innerHTML='';
+  REGIONS.forEach(r=>{
+    const cnt=d.regionCounts[r]||0;
+    const nlY=d.regionNL[r]||0;
+    const div=document.createElement('div');
+    div.className='region-card'+(currentRegion===r?' active':'');
+    div.id='rgcard-'+r;
+    div.onclick=()=>toggleRegion(r);
+    div.innerHTML=`<span class="region-badge" style="background:${REGION_COLORS[r]}">${r.toUpperCase()}</span>
+      <div class="region-name">${REGION_NAMES[r]}</div>
+      <div class="region-cnt">${cnt}<span style="font-size:.9rem;font-weight:400">건</span></div>
+      <div class="region-nl">뉴스레터 동의 ${nlY}건</div>`;
     grid.appendChild(div);
   });
 }
 
-function renderTabs(d) {
-  const tabs = document.getElementById('regionTabs');
-  tabs.innerHTML = '';
-  const allBtn = document.createElement('button');
-  allBtn.className = 'tab-btn' + (selectedRegion === 'all' ? ' active' : '');
-  allBtn.textContent = '전체 (' + d.total + ')';
-  allBtn.onclick = () => selectRegion('all');
-  tabs.appendChild(allBtn);
-  Object.entries(REGION_CONFIG).forEach(([r, cfg]) => {
-    const cnt = d.regionCounts[r] || 0;
-    if (cnt === 0) return;
-    const btn = document.createElement('button');
-    btn.className = 'tab-btn' + (selectedRegion === r ? ' active' : '');
-    btn.style.borderColor = cfg.color;
-    btn.textContent = cfg.label + ' (' + cnt + ')';
-    btn.dataset.region = r;
-    btn.onclick = () => selectRegion(r);
-    tabs.appendChild(btn);
-  });
+function toggleRegion(r){
+  if(currentRegion===r) selectRegion('all');
+  else selectRegion(r);
 }
 
-function renderEmailCards(d, region) {
-  const container = document.getElementById('emailCards');
-  const emails = region === 'all' ? [...d.emails] : d.emails.filter(e => e.region === region);
-  emails.sort((a,b) => b.datetime.localeCompare(a.datetime));
-  if (emails.length === 0) { container.innerHTML = '<div class="no-data">해당 지역의 문의가 없습니다.</div>'; return; }
-  container.innerHTML = emails.map(e => {
-    const rc = REGION_CONFIG[e.region] || {};
-    const tc = TYPE_CONFIG[e.type] || {};
-    const ac = ACTION_COLOR[e.action] || '#6B7280';
-    return `<div class="email-card">
-      <div class="ec-top">
-        <span class="ec-name">${e.name}</span>
-        <span class="ec-date">${e.datetime}</span>
-      </div>
-      <div class="ec-badges">
-        <span class="badge badge-country">${e.country}</span>
-        <span class="badge" style="background:${rc.color || '#888'}">${rc.label || e.region}</span>
-        <span class="badge" style="background:${tc.color || '#888'}">${tc.label || e.type}</span>
-        <span class="badge" style="background:${NL_COLOR[e.newsletter] || '#888'}">NL: ${e.newsletter}</span>
-      </div>
-      <div class="ec-summary">${e.summary}</div>
-      <div class="ec-contact">📧 ${e.email} &nbsp;|&nbsp; 📞 ${e.phone}</div>
-      <div class="ec-action" style="color:${ac}">⚡ ${e.action}</div>
+function selectRegion(r){
+  currentRegion=r;
+  const d=ALL_MONTHLY_DATA[currentYM];
+  if(!d)return;
+  document.querySelectorAll('.region-card').forEach(c=>c.classList.remove('active'));
+  if(r!=='all'){
+    const el=document.getElementById('rgcard-'+r);
+    if(el)el.classList.add('active');
+  }
+  updateKPIs(d,r);
+  renderTypeBars(d,r);
+  renderDonutChart(d,r);
+  renderEmailCards(d,r);
+  renderTable(d,r);
+}
+
+function renderEmailCards(d,region){
+  const grid=document.getElementById('email-grid');
+  const title=document.getElementById('email-section-title');
+  grid.innerHTML='';
+  const emails=region==='all'?[...d.emails]:[...d.emails].filter(e=>e.region===region);
+  emails.sort((a,b)=>b.datetime.localeCompare(a.datetime));
+  title.textContent=(region==='all'?'전체 이메일':REGION_NAMES[region]+' 이메일')+` (${emails.length}건)`;
+  emails.forEach(e=>{
+    const div=document.createElement('div');
+    div.className='email-card';
+    div.innerHTML=`<div class="email-card-header">
+      <span class="country-badge" style="background:${REGION_COLORS[e.region]}">${e.country}</span>
+      <span class="date-text">${e.datetime}</span>
+    </div>
+    <div class="email-name">${e.name}</div>
+    <div class="email-summary">${e.summary}</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+      <span style="padding:2px 7px;border-radius:4px;font-size:.72rem;background:${TYPE_COLORS[e.type]}22;color:${TYPE_COLORS[e.type]};border:1px solid ${TYPE_COLORS[e.type]}44">${TYPE_NAMES[e.type]}</span>
+      <span style="padding:2px 7px;border-radius:4px;font-size:.72rem;background:${e.newsletter==='Y'?'#10B98122':'#9CA3AF22'};color:${e.newsletter==='Y'?'#10B981':'#9CA3AF'};border:1px solid ${e.newsletter==='Y'?'#10B98144':'#9CA3AF44'}">NL ${e.newsletter}</span>
+      <span class="action-badge">${e.action}</span>
     </div>`;
-  }).join('');
-}
-
-function renderTable(d, region) {
-  const tbody = document.getElementById('tableBody');
-  const emails = region === 'all' ? [...d.emails] : d.emails.filter(e => e.region === region);
-  emails.sort((a,b) => b.datetime.localeCompare(a.datetime));
-  tbody.innerHTML = emails.map(e => {
-    const rc = REGION_CONFIG[e.region] || {};
-    const tc = TYPE_CONFIG[e.type] || {};
-    const ac = ACTION_COLOR[e.action] || '#6B7280';
-    return `<tr>
-      <td style="white-space:nowrap;font-size:.75rem">${e.datetime}</td>
-      <td><span class="badge" style="background:${rc.color||'#888'}">${rc.label||e.region}</span></td>
-      <td style="font-size:.78rem">${e.country}</td>
-      <td style="font-weight:600">${e.name}</td>
-      <td style="font-size:.75rem;color:var(--sub)">${e.email}</td>
-      <td><span class="badge" style="background:${tc.color||'#888'}">${tc.label||e.type}</span></td>
-      <td><span class="badge" style="background:${NL_COLOR[e.newsletter]||'#888'}">${e.newsletter}</span></td>
-      <td style="font-size:.78rem;max-width:220px">${e.summary}</td>
-      <td style="font-size:.75rem;color:${ac};font-weight:600">${e.action}</td>
-    </tr>`;
-  }).join('');
-}
-
-function toggleRegion(region) {
-  if (selectedRegion === region) { selectRegion('all'); return; }
-  selectRegion(region);
-}
-
-function selectRegion(region) {
-  selectedRegion = region;
-  const d = ALL_MONTHLY_DATA[currentYM];
-  // Update region grid
-  document.querySelectorAll('.region-kpi').forEach((el, i) => {
-    const r = Object.keys(REGION_CONFIG)[i];
-    el.classList.toggle('selected', r === region);
+    grid.appendChild(div);
   });
-  // Update tabs
-  document.querySelectorAll('.tab-btn').forEach(b => {
-    const r = b.dataset.region || 'all';
-    b.classList.toggle('active', r === region || (region === 'all' && !b.dataset.region));
-  });
-  // Update type progress with filtered data
-  const fd = getFilteredData(d, region);
-  const tp = document.getElementById('typeProgress');
-  tp.innerHTML = '';
-  const max = Math.max(...Object.values(fd.typeCounts), 1);
-  Object.entries(TYPE_CONFIG).forEach(([k, cfg]) => {
-    const cnt = fd.typeCounts[k] || 0;
-    if (cnt === 0) return;
-    tp.innerHTML += `<div class="prog-row">
-      <span class="prog-label">${cfg.label}</span>
-      <div class="prog-bar-wrap"><div class="prog-bar" style="width:${Math.round(cnt/max*100)}%;background:${cfg.color}"></div></div>
-      <span class="prog-count">${cnt}</span>
-    </div>`;
-  });
-  document.getElementById('kpiTotal').textContent = fd.total + '건';
-  document.getElementById('kpiSub').textContent = region === 'all' ? '당월 총 접수' : (REGION_CONFIG[region]||{}).label + ' 필터';
-  document.getElementById('kpiNL').textContent = fd.nlY + '건';
-  document.getElementById('kpiNLSub').textContent = fd.total > 0 ? '동의율 ' + Math.round(fd.nlY/fd.total*100) + '%' : '';
-  renderDonutChart(d);
-  renderEmailCards(d, region);
-  renderTable(d, region);
 }
 
-function toggleDark() {
-  document.documentElement.classList.toggle('dark');
+function renderTable(d,region){
+  const tbody=document.getElementById('table-body');
+  tbody.innerHTML='';
+  const emails=region==='all'?[...d.emails]:[...d.emails].filter(e=>e.region===region);
+  emails.sort((a,b)=>b.datetime.localeCompare(a.datetime));
+  emails.forEach(e=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${e.datetime}</td>
+      <td><span style="padding:2px 7px;border-radius:4px;font-size:.75rem;background:${REGION_COLORS[e.region]};color:#fff">${REGION_NAMES[e.region]}</span></td>
+      <td>${e.country}</td><td>${e.name}</td>
+      <td><span style="color:${TYPE_COLORS[e.type]}">${TYPE_NAMES[e.type]}</span></td>
+      <td style="color:${e.newsletter==='Y'?'#10B981':'#9CA3AF'}">${e.newsletter}</td>
+      <td>${e.summary}</td>
+      <td><span style="font-size:.78rem;color:var(--accent)">${e.action}</span></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function toggleDark(){
+  document.body.classList.toggle('dark');
+  const isDark=document.body.classList.contains('dark');
+  document.querySelector('.btn').textContent=isDark?'☀️ 라이트모드':'🌙 다크모드';
 }
 
 // Init
-buildNav();
+initNav();
 </script>
 </body>
 </html>
