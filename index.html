@@ -3,176 +3,199 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CTR Aftermarket Website Lead Report</title>
+<title>CTR Aftermarket Website — 고객 문의 누적 보고서</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
 :root {
   --bg: #f8fafc; --card: #ffffff; --text: #0f172a; --sub: #64748b;
-  --border: #e2e8f0; --hover: #f1f5f9; --accent: #e42526;
-  --na: #2563EB; --latam: #DC2626; --eu: #EA580C; --sea: #16A34A;
-  --af: #7C3AED; --cis: #0891B2; --ru: #65A30D; --etc: #6B7280;
+  --border: #e2e8f0; --accent: #e42526; --accent2: #1d4ed8;
+  --shadow: 0 1px 4px rgba(0,0,0,.08);
 }
 .dark {
   --bg: #0f172a; --card: #1e293b; --text: #e2e8f0; --sub: #94a3b8;
-  --border: #334155; --hover: #334155;
+  --border: #334155; --shadow: 0 1px 4px rgba(0,0,0,.4);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; transition: background 0.2s, color 0.2s; }
-.header { background: var(--card); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-.header h1 { font-size: 18px; font-weight: 700; color: var(--accent); }
-.header .sub { font-size: 12px; color: var(--sub); }
-.header-right { display: flex; gap: 8px; align-items: center; }
-.btn { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 12px; color: var(--text); }
-.btn:hover { background: var(--hover); }
-.main { max-width: 1400px; margin: 0 auto; padding: 20px 16px; }
-.nav { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; }
-.year-tabs { display: flex; gap: 6px; margin-bottom: 8px; }
-.year-tab { padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; border: 1px solid var(--border); color: var(--sub); }
-.year-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-.month-btns { display: flex; gap: 6px; flex-wrap: wrap; }
-.month-btn { padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; border: 1px solid var(--border); color: var(--sub); background: var(--bg); }
-.month-btn:hover { background: var(--hover); }
+body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; transition: background .3s, color .3s; }
+a { color: inherit; text-decoration: none; }
+
+/* HEADER */
+.hdr { background: var(--card); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.hdr-left h1 { font-size: 17px; font-weight: 700; color: var(--accent); }
+.hdr-left p { font-size: 11px; color: var(--sub); margin-top: 2px; }
+.hdr-right { display: flex; gap: 8px; }
+.btn { padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--card); color: var(--text); cursor: pointer; font-size: 12px; transition: all .2s; }
+.btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* NAV */
+.nav-wrap { background: var(--card); border-bottom: 1px solid var(--border); padding: 10px 24px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.year-tab { padding: 5px 14px; border-radius: 20px; border: 1px solid var(--border); cursor: pointer; font-size: 12px; font-weight: 600; transition: all .2s; }
+.year-tab.active { background: #334155; color: #fff; border-color: #334155; }
+.dark .year-tab.active { background: #475569; border-color: #475569; }
+.month-btn { padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--card); color: var(--sub); cursor: pointer; font-size: 12px; transition: all .2s; }
+.month-btn:hover { border-color: var(--accent); color: var(--accent); }
 .month-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-.card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
-.kpi-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-.kpi { background: var(--bg); border-radius: 10px; padding: 14px; text-align: center; }
-.kpi .val { font-size: 32px; font-weight: 800; color: var(--accent); }
-.kpi .lbl { font-size: 11px; color: var(--sub); margin-top: 2px; }
-.card-title { font-size: 13px; font-weight: 700; margin-bottom: 12px; color: var(--text); }
-.type-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-.type-label { font-size: 11px; width: 72px; color: var(--sub); }
-.progress-bar { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
-.progress-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
-.type-cnt { font-size: 11px; font-weight: 600; width: 24px; text-align: right; }
-.chart-wrap { position: relative; height: 200px; }
-.section { margin-bottom: 20px; }
-.section-title { font-size: 15px; font-weight: 700; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 2px solid var(--border); }
-.region-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
-.region-kpi { border-radius: 10px; padding: 12px; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; }
-.region-kpi:hover { transform: translateY(-1px); }
-.region-kpi.selected { border-color: currentColor; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-.region-kpi .r-name { font-size: 11px; font-weight: 700; opacity: 0.9; }
-.region-kpi .r-cnt { font-size: 24px; font-weight: 800; }
-.region-kpi .r-nl { font-size: 10px; opacity: 0.8; }
-.tab-list { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
-.tab-btn { padding: 5px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; border: 1px solid var(--border); background: var(--bg); color: var(--sub); }
-.tab-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-.email-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 10px; max-height: 500px; overflow-y: auto; }
-.email-card { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
-.email-card .ec-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-.badge { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 700; color: #fff; }
-.ec-name { font-size: 13px; font-weight: 600; }
-.ec-date { font-size: 10px; color: var(--sub); }
-.ec-summary { font-size: 12px; color: var(--sub); margin-bottom: 6px; line-height: 1.4; }
-.ec-meta { font-size: 10px; color: var(--sub); }
-.ec-action { margin-top: 6px; }
+.nav-divider { width: 1px; height: 20px; background: var(--border); margin: 0 4px; }
+
+/* MAIN */
+.main { padding: 20px 24px; max-width: 1400px; margin: 0 auto; }
+.section-title { font-size: 13px; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: .05em; margin: 24px 0 12px; }
+
+/* KPI GRID */
+.kpi-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.card { background: var(--card); border-radius: 12px; padding: 18px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+.kpi-val { font-size: 36px; font-weight: 800; line-height: 1; margin: 8px 0 4px; }
+.kpi-label { font-size: 12px; color: var(--sub); }
+.kpi-sub { font-size: 11px; color: var(--sub); margin-top: 2px; }
+
+/* TYPE CARD */
+.type-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.type-name { width: 72px; font-size: 12px; color: var(--sub); flex-shrink: 0; }
+.type-bar-wrap { flex: 1; background: var(--border); border-radius: 99px; height: 8px; }
+.type-bar { height: 8px; border-radius: 99px; }
+.type-count { width: 28px; text-align: right; font-size: 12px; font-weight: 600; }
+
+/* CHART GRID */
+.chart-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.chart-card { background: var(--card); border-radius: 12px; padding: 18px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+.chart-title { font-size: 12px; font-weight: 700; color: var(--sub); margin-bottom: 14px; text-transform: uppercase; letter-spacing: .04em; }
+canvas { max-height: 220px; }
+
+/* TREND */
+.trend-card { background: var(--card); border-radius: 12px; padding: 18px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+#trendChart { max-height: 200px; }
+
+/* REGION GRID */
+.region-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.region-card { background: var(--card); border-radius: 10px; padding: 14px; border: 2px solid var(--border); cursor: pointer; transition: all .2s; }
+.region-card:hover, .region-card.active { border-color: var(--accent); }
+.region-card .r-label { font-size: 11px; color: var(--sub); margin-bottom: 4px; }
+.region-card .r-count { font-size: 22px; font-weight: 800; }
+.region-card .r-nl { font-size: 11px; color: var(--sub); margin-top: 3px; }
+.region-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+
+/* RESET BTN */
+.reset-btn { padding: 5px 14px; border-radius: 6px; border: 1px solid var(--border); background: var(--card); color: var(--sub); cursor: pointer; font-size: 12px; }
+.reset-btn:hover { background: var(--border); }
+
+/* EMAIL CARDS */
+.email-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.email-card { background: var(--card); border-radius: 10px; padding: 14px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+.email-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.email-name { font-weight: 600; font-size: 13px; }
+.email-dt { font-size: 10px; color: var(--sub); }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 600; }
+.badge-region { color: #fff; }
+.badge-type { margin-left: 4px; }
+.email-summary { font-size: 12px; color: var(--sub); margin: 6px 0; line-height: 1.5; }
+.email-meta { font-size: 11px; color: var(--sub); margin-top: 6px; }
+.action-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; background: #fef3c7; color: #92400e; margin-top: 6px; }
+.dark .action-badge { background: #422006; color: #fcd34d; }
+.nl-badge { display: inline-block; padding: 1px 6px; border-radius: 99px; font-size: 10px; font-weight: 700; margin-left: 4px; }
+.nl-y { background: #dcfce7; color: #166534; }
+.nl-n { background: #fee2e2; color: #991b1b; }
+.nl-blank { background: #f1f5f9; color: #64748b; }
+.dark .nl-y { background: #14532d; color: #86efac; }
+.dark .nl-n { background: #7f1d1d; color: #fca5a5; }
+.dark .nl-blank { background: #334155; color: #94a3b8; }
+
+/* TABLE */
+.tbl-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 12px; }
-th { background: var(--hover); padding: 8px 10px; text-align: left; font-weight: 600; font-size: 11px; color: var(--sub); border-bottom: 2px solid var(--border); position: sticky; top: 0; }
-td { padding: 7px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-tr:hover td { background: var(--hover); }
-.table-wrap { max-height: 400px; overflow-y: auto; border: 1px solid var(--border); border-radius: 10px; }
-.filter-bar { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
-footer { text-align: center; padding: 20px; font-size: 11px; color: var(--sub); border-top: 1px solid var(--border); margin-top: 20px; }
-@media print { .header-right, .nav, .filter-bar { display: none; } }
-@media (max-width: 900px) { .grid3 { grid-template-columns: 1fr; } .region-grid { grid-template-columns: repeat(2, 1fr); } }
+th { background: var(--border); padding: 8px 10px; text-align: left; font-weight: 600; position: sticky; top: 0; }
+td { padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+tr:hover td { background: rgba(228,37,38,.04); }
+
+/* FOOTER */
+footer { text-align: center; padding: 20px; color: var(--sub); font-size: 11px; border-top: 1px solid var(--border); margin-top: 32px; }
+
+@media print { .hdr-right, .nav-wrap { display: none; } }
 </style>
 </head>
 <body>
-<div class="header">
-  <div>
-    <div class="header h1" style="font-size:18px;font-weight:700;color:#e42526;">CTR Aftermarket Website Lead Report</div>
-    <div class="sub">고객 문의 누적 분석 보고서 · 마지막 업데이트: 2026-04-28 23:57 (KST)</div>
-  </div>
-  <div class="header-right">
-    <button class="btn" onclick="toggleDark()">🌙 다크모드</button>
-    <button class="btn" onclick="window.print()">🖨 인쇄</button>
-  </div>
-</div>
 
-<div class="main">
-  <!-- 연/월 네비게이터 -->
-  <div class="nav">
-    <div class="year-tabs" id="yearTabs"></div>
-    <div class="month-btns" id="monthBtns"></div>
+<header class="hdr">
+  <div class="hdr-left">
+    <h1>CTR Aftermarket Website — 고객 문의 누적 보고서</h1>
+    <p id="lastUpdate">마지막 업데이트: 2026-05-07 08:32 (KST)</p>
   </div>
+  <div class="hdr-right">
+    <button class="btn" onclick="toggleDark()">🌙 다크/라이트</button>
+    <button class="btn" onclick="window.print()">🖨️ 인쇄</button>
+  </div>
+</header>
 
+<nav class="nav-wrap" id="navWrap"></nav>
+
+<main class="main">
   <!-- 선택 월 요약 -->
-  <div class="section">
-    <div class="section-title" id="sectionTitle">요약</div>
-    <div class="grid3">
-      <!-- 왼쪽: KPI + 유형 -->
-      <div>
-        <div class="kpi-row">
-          <div class="kpi">
-            <div class="val" id="kpiTotal">-</div>
-            <div class="lbl">총 문의</div>
-          </div>
-          <div class="kpi">
-            <div class="val" id="kpiNL">-</div>
-            <div class="lbl">뉴스레터 동의</div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-title">문의 유형 분포</div>
-          <div id="typeChart"></div>
-        </div>
-      </div>
-      <!-- 가운데: 지역별 막대 차트 -->
-      <div class="card">
-        <div class="card-title">지역별 문의 건수</div>
-        <div class="chart-wrap"><canvas id="barChart"></canvas></div>
-      </div>
-      <!-- 오른쪽: 도넛 차트 -->
-      <div class="card">
-        <div class="card-title">뉴스레터 동의율</div>
-        <div class="chart-wrap"><canvas id="donutChart"></canvas></div>
-      </div>
-    </div>
-  </div>
+  <div class="section-title" id="monthTitle">2026년 5월 요약</div>
 
-  <!-- 연간 추이 -->
-  <div class="section">
-    <div class="section-title">연간 문의 추이</div>
+  <div class="kpi-grid" style="margin-bottom:16px">
+    <!-- KPI ① 총 문의 -->
     <div class="card">
-      <div class="chart-wrap" style="height:180px;"><canvas id="trendChart"></canvas></div>
+      <div class="kpi-label">📨 총 문의</div>
+      <div class="kpi-val" id="kpiTotal">—</div>
+      <div class="kpi-sub" id="kpiRegionSub"></div>
     </div>
-  </div>
-
-  <!-- 지역별 KPI -->
-  <div class="section">
-    <div class="section-title">지역별 현황</div>
-    <div class="region-grid" id="regionGrid"></div>
-    <!-- 지역 상세 이메일 카드 -->
+    <!-- KPI ② 뉴스레터 동의 -->
     <div class="card">
-      <div class="tab-list" id="regionTabs"></div>
-      <div class="email-grid" id="emailGrid"></div>
+      <div class="kpi-label">📬 뉴스레터 동의</div>
+      <div class="kpi-val" id="kpiNL">—</div>
+      <div class="kpi-sub" id="kpiNLRate"></div>
+    </div>
+    <!-- 문의 유형 카드 -->
+    <div class="card">
+      <div class="kpi-label" style="margin-bottom:10px">📊 문의 유형</div>
+      <div id="typeRows"></div>
     </div>
   </div>
 
-  <!-- 상세 테이블 -->
-  <div class="section">
-    <div class="section-title">전체 상세 데이터</div>
-    <div class="filter-bar">
-      <span style="font-size:12px;font-weight:600;">지역 필터:</span>
-      <div id="tableFilterBtns"></div>
-      <button class="btn" onclick="resetFilter()">초기화</button>
+  <!-- 차트 그리드 -->
+  <div class="chart-grid" style="margin-bottom:16px">
+    <div class="chart-card" style="grid-column:1/2">
+      <div class="chart-title">지역별 문의</div>
+      <canvas id="barChart"></canvas>
     </div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>수신일시</th><th>지역</th><th>국가</th><th>이름</th>
-            <th>이메일</th><th>유형</th><th>뉴스레터</th><th>요약</th><th>권고사항</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-      </table>
+    <div class="chart-card" style="grid-column:2/3">
+      <div class="chart-title">뉴스레터 동의율</div>
+      <canvas id="donutChart"></canvas>
+    </div>
+    <div class="trend-card" style="grid-column:3/4">
+      <div class="chart-title">연간 추이</div>
+      <canvas id="trendChart"></canvas>
     </div>
   </div>
-</div>
 
-<footer>CTR Co., Ltd. Aftermarket Division · Lead Management Report · 자동 생성 보고서</footer>
+  <!-- 지역 KPI -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <div class="section-title" style="margin:0">지역별 현황</div>
+    <button class="reset-btn" onclick="selectRegion('all')">전체 보기</button>
+  </div>
+  <div class="region-grid" id="regionGrid" style="margin-bottom:20px"></div>
+
+  <!-- 이메일 카드 -->
+  <div class="section-title">문의 상세 <span id="filterLabel" style="color:var(--accent)"></span></div>
+  <div class="email-grid" id="emailGrid" style="margin-bottom:20px"></div>
+
+  <!-- 테이블 -->
+  <div class="section-title">전체 데이터 테이블</div>
+  <div class="card tbl-wrap">
+    <table id="dataTable">
+      <thead>
+        <tr>
+          <th>수신 일시</th><th>국가</th><th>이름</th><th>이메일</th>
+          <th>전화</th><th>유형</th><th>NL</th><th>문의 요약</th><th>권고</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+</main>
+
+<footer>
+  CTR Co., Ltd. Aftermarket Division &nbsp;·&nbsp; 자동 생성 보고서 &nbsp;·&nbsp; © 2026
+</footer>
 
 <script>
 // __DATA_START__
@@ -750,283 +773,621 @@ const ALL_MONTHLY_DATA = {
         "action": "견적서 발송 필요"
       }
     ]
+  },
+  "2026-05": {
+    "label": "2026년 5월",
+    "total": 15,
+    "nlY": 11,
+    "typeCounts": {
+      "parts": 1,
+      "purchase": 7,
+      "price": 1,
+      "technical": 1,
+      "complaint": 0,
+      "empty": 3,
+      "other": 2
+    },
+    "regionCounts": {
+      "na": 2,
+      "latam": 5,
+      "eu": 1,
+      "sea": 0,
+      "af": 2,
+      "cis": 3,
+      "ru": 0,
+      "etc": 2
+    },
+    "regionNL": {
+      "na": 2,
+      "latam": 4,
+      "eu": 0,
+      "sea": 0,
+      "af": 1,
+      "cis": 2,
+      "ru": 0,
+      "etc": 2
+    },
+    "regionNL_N": {
+      "na": 0,
+      "latam": 0,
+      "eu": 1,
+      "sea": 0,
+      "af": 1,
+      "cis": 1,
+      "ru": 0,
+      "etc": 0
+    },
+    "regionNL_Blank": {
+      "na": 0,
+      "latam": 1,
+      "eu": 0,
+      "sea": 0,
+      "af": 0,
+      "cis": 0,
+      "ru": 0,
+      "etc": 0
+    },
+    "regionTypeCounts": {
+      "na": {
+        "parts": 0,
+        "purchase": 0,
+        "price": 1,
+        "technical": 1,
+        "complaint": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "latam": {
+        "parts": 0,
+        "purchase": 4,
+        "price": 0,
+        "technical": 0,
+        "complaint": 0,
+        "empty": 1,
+        "other": 0
+      },
+      "eu": {
+        "parts": 0,
+        "purchase": 1,
+        "price": 0,
+        "technical": 0,
+        "complaint": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "sea": {
+        "parts": 0,
+        "purchase": 0,
+        "price": 0,
+        "technical": 0,
+        "complaint": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "af": {
+        "parts": 0,
+        "purchase": 0,
+        "price": 0,
+        "technical": 0,
+        "complaint": 0,
+        "empty": 1,
+        "other": 1
+      },
+      "cis": {
+        "parts": 0,
+        "purchase": 1,
+        "price": 0,
+        "technical": 0,
+        "complaint": 0,
+        "empty": 1,
+        "other": 1
+      },
+      "ru": {
+        "parts": 0,
+        "purchase": 0,
+        "price": 0,
+        "technical": 0,
+        "complaint": 0,
+        "empty": 0,
+        "other": 0
+      },
+      "etc": {
+        "parts": 1,
+        "purchase": 1,
+        "price": 0,
+        "technical": 0,
+        "complaint": 0,
+        "empty": 0,
+        "other": 0
+      }
+    },
+    "emails": [
+      {
+        "datetime": "2026-05-06 05:15 (KST)",
+        "region": "af",
+        "country": "Lebanon",
+        "name": "Farouk Daouk",
+        "email": "aibccompany108@gmail.com",
+        "phone": "76198488",
+        "type": "other",
+        "newsletter": "Y",
+        "summary": "CTR 제품에 대해 더 알고 싶다며 비즈니스 협력 가능성 타진",
+        "action": "담당자 검토 필요"
+      },
+      {
+        "datetime": "2026-05-05 14:23 (KST)",
+        "region": "cis",
+        "country": "Turkmenistan",
+        "name": "Sirozhiddin",
+        "email": "sirojiddintagaynazarow0@gmail.com",
+        "phone": "+99371673693",
+        "type": "empty",
+        "newsletter": "Y",
+        "summary": "본문 내용이 '자동차 시장(Автомаркет)'으로만 작성되어 실질적인 문의 내용 없음",
+        "action": "내용 확인 후 회신 필요"
+      },
+      {
+        "datetime": "2026-05-05 13:33 (KST)",
+        "region": "latam",
+        "country": "Peru",
+        "name": "Omar Taipe",
+        "email": "omartaipe@gmail.com",
+        "phone": "+51987922000",
+        "type": "purchase",
+        "newsletter": "Y",
+        "summary": "CTR 공식 유통업체가 되고 싶으며, 필요 조건을 문의",
+        "action": "영업팀 연락 필요"
+      },
+      {
+        "datetime": "2026-05-05 13:29 (KST)",
+        "region": "latam",
+        "country": "Peru",
+        "name": "Omar Taipe",
+        "email": "omartaipe@gmail.com",
+        "phone": "+51987922000",
+        "type": "purchase",
+        "newsletter": "Y",
+        "summary": "리마 페루 CTR 공식 대리인·유통업체 신청 조건 문의 (4분 간격 재전송)",
+        "action": "영업팀 연락 필요"
+      },
+      {
+        "datetime": "2026-05-05 10:23 (KST)",
+        "region": "latam",
+        "country": "Bolivia",
+        "name": "Dussan Mamani",
+        "email": "dussanmamani000@gmail.com",
+        "phone": "65215112",
+        "type": "empty",
+        "newsletter": "Y",
+        "summary": "본문이 'Hola(안녕하세요)'로만 작성되어 실질적 문의 내용 없음",
+        "action": "내용 확인 후 회신 필요"
+      },
+      {
+        "datetime": "2026-05-04 19:14 (KST)",
+        "region": "eu",
+        "country": "France",
+        "name": "Victor Verignon",
+        "email": "victorverignon@gmail.com",
+        "phone": "0750325277",
+        "type": "purchase",
+        "newsletter": "N",
+        "summary": "Tesla Model X용 컨트롤 암 구매 방법 문의",
+        "action": "영업팀 연락 필요"
+      },
+      {
+        "datetime": "2026-05-04 05:31 (KST)",
+        "region": "na",
+        "country": "Canada",
+        "name": "Adrianne",
+        "email": "adrianne_diga@yahoo.com",
+        "phone": "8257339861",
+        "type": "price",
+        "newsletter": "Y",
+        "summary": "Honda Odyssey 2007 프론트 CV 액슬(좌우) 및 엔진 인접 고무 씰 가격 문의",
+        "action": "견적서 발송 필요"
+      },
+      {
+        "datetime": "2026-05-04 01:37 (KST)",
+        "region": "af",
+        "country": "Mozambique",
+        "name": "Paulo Patricio Matiquite",
+        "email": "paulopatriciomatiquite@gmail.com",
+        "phone": "+258862400055",
+        "type": "empty",
+        "newsletter": "N",
+        "summary": "본문 내용이 의미 없는 문자('Uygto')로만 작성되어 실질적 문의 없음",
+        "action": "내용 확인 후 회신 필요"
+      },
+      {
+        "datetime": "2026-05-03 09:19 (KST)",
+        "region": "na",
+        "country": "United States",
+        "name": "Neil Rivera",
+        "email": "neilrivera1990@gmail.com",
+        "phone": "15184149977",
+        "type": "technical",
+        "newsletter": "Y",
+        "summary": "2020 Toyota Corolla용 Inner Tie Rod(CR0842) 포장 내 클로/락워셔(OEM #90214-22001) 포함 여부 및 규격 문의",
+        "action": "기술팀 이관 필요"
+      },
+      {
+        "datetime": "2026-05-03 06:08 (KST)",
+        "region": "latam",
+        "country": "Paraguay",
+        "name": "Arturo Ayala",
+        "email": "arturoayala138@gmail.com",
+        "phone": "0984346861",
+        "type": "purchase",
+        "newsletter": "미표기",
+        "summary": "CTR 부품 수입 절차 문의",
+        "action": "영업팀 연락 필요"
+      },
+      {
+        "datetime": "2026-05-03 06:07 (KST)",
+        "region": "etc",
+        "country": "Korea (Republic of)*",
+        "name": "Arturo Ayala",
+        "email": "arturoayala138@gmail.com",
+        "phone": "0984346861",
+        "type": "purchase",
+        "newsletter": "Y",
+        "summary": "CTR 부품 수입 절차 문의 (국가 선택 오류 추정, 파라과이 전화번호)",
+        "action": "영업팀 연락 필요"
+      },
+      {
+        "datetime": "2026-05-02 05:49 (KST)",
+        "region": "etc",
+        "country": "Korea (Republic of)*",
+        "name": "Omer Fernández",
+        "email": "omer.fernandez@gmail.com",
+        "phone": "+584146954031",
+        "type": "parts",
+        "newsletter": "Y",
+        "summary": "미국·아시아 차량용 너클·타이로드 엔드·부시 제품 정보 문의 (베네수엘라 번호, 국가 선택 오류 추정)",
+        "action": "제품 정보 안내 필요"
+      },
+      {
+        "datetime": "2026-05-02 05:15 (KST)",
+        "region": "cis",
+        "country": "Georgia",
+        "name": "David Peikrishvili",
+        "email": "dpeiqrishvili@yahoo.com",
+        "phone": "+995555483848",
+        "type": "purchase",
+        "newsletter": "Y",
+        "summary": "테슬라 부품 작업 중, CTR 제품 구매 희망 및 중국 사무소·공장 유무 문의",
+        "action": "영업팀 연락 필요"
+      },
+      {
+        "datetime": "2026-05-02 01:13 (KST)",
+        "region": "latam",
+        "country": "Paraguay",
+        "name": "Víctor Aranda",
+        "email": "victoraranda.import@gmail.con",
+        "phone": "0987206921",
+        "type": "purchase",
+        "newsletter": "Y",
+        "summary": "서스펜션 정비소 체인에 CTR 부품을 독점 사용하고자 파트너십 문의",
+        "action": "영업팀 연락 필요"
+      },
+      {
+        "datetime": "2026-05-01 11:49 (KST)",
+        "region": "cis",
+        "country": "Kyrgyzstan",
+        "name": "Irbis",
+        "email": "itikulov.irbis@yandex.com",
+        "phone": "+996700135740",
+        "type": "other",
+        "newsletter": "N",
+        "summary": "CTR WhatsApp 번호 요청",
+        "action": "담당자 검토 필요"
+      }
+    ]
   }
 };
 // __DATA_END__
 
-const REGION_INFO = {
-  na:    { name: '북미', color: '#2563EB' },
+const REGION_META = {
+  na:    { name: '북미',   color: '#2563EB' },
   latam: { name: '중남미', color: '#DC2626' },
-  eu:    { name: '유럽', color: '#EA580C' },
+  eu:    { name: '유럽',   color: '#EA580C' },
   sea:   { name: '동남아', color: '#16A34A' },
   af:    { name: '아중동', color: '#7C3AED' },
-  cis:   { name: 'CIS', color: '#0891B2' },
+  cis:   { name: 'CIS',   color: '#0891B2' },
   ru:    { name: '러시아', color: '#65A30D' },
-  etc:   { name: '기타', color: '#6B7280' }
+  etc:   { name: '기타',   color: '#6B7280' }
 };
-const TYPE_INFO = {
-  parts:     { name: '부품정보', color: '#0EA5E9' },
+const TYPE_META = {
+  parts:     { name: '부품 정보', color: '#0EA5E9' },
   purchase:  { name: '구매/주문', color: '#10B981' },
   price:     { name: '가격/견적', color: '#F59E0B' },
-  technical: { name: '기술지원', color: '#8B5CF6' },
+  technical: { name: '기술 지원', color: '#8B5CF6' },
   complaint: { name: '불만/A·S', color: '#EF4444' },
-  empty:     { name: '내용없음', color: '#9CA3AF' },
-  other:     { name: '기타', color: '#6B7280' }
+  empty:     { name: '내용 없음', color: '#9CA3AF' },
+  other:     { name: '기타',     color: '#6B7280' }
 };
 
-let currentYM = null, currentRegion = 'all', barChartInst = null, donutChartInst = null, trendChartInst = null;
-let tableFilterRegion = 'all';
+let currentMonth = '';
+let currentRegion = 'all';
+let barChartInst = null;
+let donutChartInst = null;
+let trendChartInst = null;
 
 function toggleDark() {
   document.body.classList.toggle('dark');
+  rebuildCharts();
 }
 
-function initNav() {
-  const years = [...new Set(Object.keys(ALL_MONTHLY_DATA).map(k => k.slice(0,4)))].sort();
-  const ytDiv = document.getElementById('yearTabs');
+// ── 내비게이터 ──────────────────────────────────────────────────────────────
+function buildNav() {
+  const wrap = document.getElementById('navWrap');
+  const years = [...new Set(Object.keys(ALL_MONTHLY_DATA).map(k => k.split('-')[0]))].sort();
+  let html = '';
   years.forEach(y => {
-    const b = document.createElement('button');
-    b.className = 'year-tab'; b.textContent = y + '년'; b.dataset.year = y;
-    b.onclick = () => selectYear(y);
-    ytDiv.appendChild(b);
+    html += `<button class="year-tab" id="ytab-${y}" onclick="loadYear('${y}')">${y}년</button>`;
+    html += '<div class="nav-divider"></div>';
+    Object.keys(ALL_MONTHLY_DATA).filter(k => k.startsWith(y)).sort().forEach(mk => {
+      const m = mk.split('-')[1];
+      html += `<button class="month-btn" id="mbtn-${mk}" onclick="loadMonth('${mk}')">${parseInt(m)}월</button>`;
+    });
+    html += '<div class="nav-divider"></div>';
   });
-  const latestYM = Object.keys(ALL_MONTHLY_DATA).sort().pop();
-  selectYear(latestYM.slice(0,4), latestYM);
+  wrap.innerHTML = html;
 }
 
-function selectYear(year, preselect) {
-  document.querySelectorAll('.year-tab').forEach(b => b.classList.toggle('active', b.dataset.year === year));
-  const mbDiv = document.getElementById('monthBtns');
-  mbDiv.innerHTML = '';
-  const months = Object.keys(ALL_MONTHLY_DATA).filter(k => k.startsWith(year)).sort();
-  months.forEach(ym => {
-    const b = document.createElement('button');
-    b.className = 'month-btn'; b.textContent = ym.slice(5) + '월'; b.dataset.ym = ym;
-    b.onclick = () => loadMonth(ym);
-    mbDiv.appendChild(b);
-  });
-  loadMonth(preselect || months[months.length - 1]);
+function loadYear(y) {
+  document.querySelectorAll('.year-tab').forEach(b => b.classList.remove('active'));
+  const el = document.getElementById('ytab-' + y);
+  if (el) el.classList.add('active');
+  renderTrendChart(y);
 }
 
 function loadMonth(ym) {
-  currentYM = ym;
-  currentRegion = 'all';
-  document.querySelectorAll('.month-btn').forEach(b => b.classList.toggle('active', b.dataset.ym === ym));
-  const d = ALL_MONTHLY_DATA[ym];
-  document.getElementById('sectionTitle').textContent = d.label + ' 요약';
-  document.getElementById('kpiTotal').textContent = d.total;
-  document.getElementById('kpiNL').textContent = d.nlY;
-  renderTypeChart(d);
-  renderBarChart(d);
-  renderDonutChart(d);
-  renderTrendChart(ym.slice(0,4));
-  renderRegionGrid(d);
-  renderRegionTabs(d);
-  renderEmailGrid(d, 'all');
-  renderTable(d, 'all');
-  renderTableFilterBtns(d);
+  currentMonth = ym;
+  selectRegion('all');
+  document.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
+  const el = document.getElementById('mbtn-' + ym);
+  if (el) el.classList.add('active');
+  const [y] = ym.split('-');
+  loadYear(y);
+  renderMonthUI();
 }
 
-function renderTypeChart(d) {
-  const wrap = document.getElementById('typeChart');
-  wrap.innerHTML = '';
-  const total = d.total || 1;
-  Object.entries(TYPE_INFO).forEach(([k, info]) => {
-    const cnt = (d.typeCounts || {})[k] || 0;
-    const pct = Math.round(cnt / total * 100);
-    wrap.innerHTML += `<div class="type-row">
-      <span class="type-label">${info.name}</span>
-      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${info.color}"></div></div>
-      <span class="type-cnt">${cnt}</span>
+// ── 월 UI ───────────────────────────────────────────────────────────────────
+function renderMonthUI() {
+  const d = ALL_MONTHLY_DATA[currentMonth];
+  if (!d) return;
+  document.getElementById('monthTitle').textContent = d.label + ' 요약';
+
+  const rc = currentRegion === 'all' ? d.regionCounts : {};
+  const filteredEmails = currentRegion === 'all'
+    ? d.emails
+    : d.emails.filter(e => e.region === currentRegion);
+
+  // KPI 총 문의
+  const tot = filteredEmails.length;
+  document.getElementById('kpiTotal').textContent = tot + '건';
+  document.getElementById('kpiRegionSub').textContent =
+    currentRegion === 'all'
+      ? `총 ${Object.keys(REGION_META).filter(r => d.regionCounts[r] > 0).length}개 지역`
+      : REGION_META[currentRegion].name + ' 필터 적용';
+
+  // KPI 뉴스레터
+  const nlY = filteredEmails.filter(e => e.newsletter === 'Y').length;
+  document.getElementById('kpiNL').textContent = nlY + '건';
+  document.getElementById('kpiNLRate').textContent =
+    tot > 0 ? `동의율 ${Math.round(nlY / tot * 100)}%` : '';
+
+  // 유형 카드
+  const typeMax = Math.max(...Object.values(TYPE_META).map(t => {
+    const cnt = filteredEmails.filter(e => e.type === Object.keys(TYPE_META).find(k => TYPE_META[k] === t)).length;
+    return cnt;
+  }), 1);
+  let typeHtml = '';
+  Object.entries(TYPE_META).forEach(([k, v]) => {
+    const cnt = filteredEmails.filter(e => e.type === k).length;
+    const pct = Math.round(cnt / Math.max(tot, 1) * 100);
+    typeHtml += `<div class="type-row">
+      <span class="type-name">${v.name}</span>
+      <div class="type-bar-wrap"><div class="type-bar" style="width:${pct}%;background:${v.color}"></div></div>
+      <span class="type-count">${cnt}</span>
     </div>`;
   });
+  document.getElementById('typeRows').innerHTML = typeHtml;
+
+  // 차트 재렌더
+  rebuildCharts();
+
+  // 지역 그리드
+  renderRegionGrid(d, filteredEmails);
+
+  // 이메일 카드
+  renderEmailCards(filteredEmails);
+
+  // 테이블
+  renderTable(filteredEmails);
 }
 
-function renderBarChart(d) {
-  if (barChartInst) { barChartInst.destroy(); }
-  const rc = d.regionCounts || {};
-  const labels = Object.keys(REGION_INFO).map(k => REGION_INFO[k].name);
-  const vals = Object.keys(REGION_INFO).map(k => rc[k] || 0);
-  const colors = Object.keys(REGION_INFO).map(k => REGION_INFO[k].color);
+// ── 차트 ────────────────────────────────────────────────────────────────────
+function getChartColors() {
+  const dark = document.body.classList.contains('dark');
+  return { grid: dark ? '#334155' : '#e2e8f0', text: dark ? '#94a3b8' : '#64748b' };
+}
+
+function rebuildCharts() {
+  const d = ALL_MONTHLY_DATA[currentMonth];
+  if (!d) return;
+  const filteredEmails = currentRegion === 'all'
+    ? d.emails
+    : d.emails.filter(e => e.region === currentRegion);
+  const { grid, text } = getChartColors();
+
+  // 막대 차트
+  const barData = Object.entries(REGION_META).map(([k, v]) => ({
+    label: v.name, value: filteredEmails.filter(e => e.region === k).length, color: v.color
+  }));
+  if (barChartInst) barChartInst.destroy();
   barChartInst = new Chart(document.getElementById('barChart'), {
     type: 'bar',
-    data: { labels, datasets: [{ data: vals, backgroundColor: colors, borderRadius: 6 }] },
+    data: {
+      labels: barData.map(r => r.label),
+      datasets: [{ data: barData.map(r => r.value), backgroundColor: barData.map(r => r.color), borderRadius: 4 }]
+    },
     options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.raw}건` } } },
+      responsive: true, plugins: { legend: { display: false } },
       scales: {
-        x: { grid: { display: false }, ticks: { font: { size: 10 } } },
-        y: { beginAtZero: true, ticks: { precision: 0 } }
+        x: { ticks: { color: text, font: { size: 10 } }, grid: { color: grid } },
+        y: { ticks: { color: text, stepSize: 1, font: { size: 10 } }, grid: { color: grid }, beginAtZero: true }
       },
-      onClick: (e, els) => {
-        if (els.length) { const rk = Object.keys(REGION_INFO)[els[0].index]; toggleRegion(rk); }
-      }
+      onClick: (_, els) => { if (els.length) toggleRegion(Object.keys(REGION_META)[els[0].index]); }
     }
   });
-}
 
-function renderDonutChart(d) {
-  if (donutChartInst) { donutChartInst.destroy(); }
-  const total = d.total || 1, nlY = d.nlY || 0, nlN_total = total - nlY;
+  // 도넛 차트
+  const nlY = filteredEmails.filter(e => e.newsletter === 'Y').length;
+  const nlN = filteredEmails.filter(e => e.newsletter === 'N').length;
+  const nlB = filteredEmails.filter(e => e.newsletter !== 'Y' && e.newsletter !== 'N').length;
+  if (donutChartInst) donutChartInst.destroy();
   donutChartInst = new Chart(document.getElementById('donutChart'), {
     type: 'doughnut',
     data: {
-      labels: ['동의 (Y)', '미동의/미표기'],
-      datasets: [{ data: [nlY, nlN_total], backgroundColor: ['#e42526', '#e2e8f0'], borderWidth: 0 }]
+      labels: ['동의', '미동의', '미표기'],
+      datasets: [{ data: [nlY, nlN, nlB], backgroundColor: ['#10B981', '#EF4444', '#94A3B8'], borderWidth: 0 }]
     },
     options: {
-      responsive: true, maintainAspectRatio: false,
-      cutout: '65%',
-      plugins: {
-        legend: { position: 'bottom', labels: { font: { size: 10 }, padding: 8 } },
-        tooltip: { callbacks: { label: ctx => ` ${ctx.raw}건 (${Math.round(ctx.raw/total*100)}%)` } }
-      }
+      responsive: true, cutout: '65%',
+      plugins: { legend: { position: 'bottom', labels: { color: text, font: { size: 10 }, padding: 8 } } }
     }
   });
 }
 
 function renderTrendChart(year) {
-  if (trendChartInst) { trendChartInst.destroy(); }
+  const { grid, text } = getChartColors();
   const months = Object.keys(ALL_MONTHLY_DATA).filter(k => k.startsWith(year)).sort();
-  const labels = months.map(m => m.slice(5) + '월');
-  const vals = months.map(m => ALL_MONTHLY_DATA[m].total);
-  const pointColors = months.map(m => m === currentYM ? '#e42526' : '#3b82f6');
-  const pointSizes = months.map(m => m === currentYM ? 8 : 4);
+  const labels = months.map(m => parseInt(m.split('-')[1]) + '월');
+  const totals = months.map(m => ALL_MONTHLY_DATA[m].total);
+  const nlYs = months.map(m => ALL_MONTHLY_DATA[m].nlY);
+  if (trendChartInst) trendChartInst.destroy();
   trendChartInst = new Chart(document.getElementById('trendChart'), {
     type: 'line',
-    data: { labels, datasets: [{ data: vals, borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', tension: 0.3, pointBackgroundColor: pointColors, pointRadius: pointSizes, fill: true }] },
+    data: {
+      labels,
+      datasets: [
+        { label: '총 문의', data: totals, borderColor: '#e42526', backgroundColor: 'rgba(228,37,38,.1)', tension: .3, fill: true,
+          pointBackgroundColor: months.map(m => m === currentMonth ? '#e42526' : '#fff'),
+          pointBorderColor: '#e42526', pointRadius: months.map(m => m === currentMonth ? 6 : 4) },
+        { label: 'NL동의', data: nlYs, borderColor: '#10B981', backgroundColor: 'rgba(16,185,129,.08)', tension: .3, fill: true,
+          pointBackgroundColor: '#10B981', pointRadius: 3 }
+      ]
+    },
     options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.raw}건` } } },
-      scales: { x: { grid: { display: false } }, y: { beginAtZero: true, ticks: { precision: 0 } } },
-      onClick: (e, els) => { if (els.length) { loadMonth(months[els[0].index]); } }
+      responsive: true,
+      plugins: { legend: { position: 'bottom', labels: { color: text, font: { size: 10 }, padding: 6 } } },
+      scales: {
+        x: { ticks: { color: text, font: { size: 10 } }, grid: { color: grid } },
+        y: { ticks: { color: text, font: { size: 10 } }, grid: { color: grid }, beginAtZero: true }
+      },
+      onClick: (_, els) => { if (els.length) loadMonth(months[els[0].index]); }
     }
   });
 }
 
-function renderRegionGrid(d) {
-  const grid = document.getElementById('regionGrid');
-  grid.innerHTML = '';
-  Object.entries(REGION_INFO).forEach(([k, info]) => {
-    const cnt = (d.regionCounts || {})[k] || 0;
-    const nlY = (d.regionNL || {})[k] || 0;
-    const div = document.createElement('div');
-    div.className = 'region-kpi'; div.dataset.region = k;
-    div.style.background = info.color + '20'; div.style.color = info.color;
-    div.innerHTML = `<div class="r-name">${info.name}</div><div class="r-cnt">${cnt}</div><div class="r-nl">뉴스레터 ${nlY}건</div>`;
-    div.onclick = () => toggleRegion(k);
-    grid.appendChild(div);
-  });
-}
-
-function toggleRegion(r) {
-  currentRegion = (currentRegion === r) ? 'all' : r;
-  selectRegion(currentRegion);
-}
-
-function selectRegion(r) {
-  currentRegion = r;
-  document.querySelectorAll('.region-kpi').forEach(el => el.classList.toggle('selected', el.dataset.region === r));
-  const d = ALL_MONTHLY_DATA[currentYM];
-  renderEmailGrid(d, r);
-  renderRegionTabs(d, r);
-  renderTable(d, r);
-  tableFilterRegion = r;
-  document.querySelectorAll('.tbl-filter-btn').forEach(b => b.classList.toggle('active', b.dataset.region === r));
-}
-
-function renderRegionTabs(d, selectedR) {
-  const wrap = document.getElementById('regionTabs');
-  wrap.innerHTML = '';
-  const allBtn = document.createElement('button');
-  allBtn.className = 'tab-btn' + ((!selectedR || selectedR === 'all') ? ' active' : '');
-  allBtn.textContent = '전체';
-  allBtn.onclick = () => selectRegion('all');
-  wrap.appendChild(allBtn);
-  Object.entries(REGION_INFO).forEach(([k, info]) => {
-    const cnt = (d.regionCounts || {})[k] || 0;
-    if (cnt === 0) return;
-    const b = document.createElement('button');
-    b.className = 'tab-btn' + (selectedR === k ? ' active' : '');
-    b.textContent = `${info.name} (${cnt})`;
-    b.style.borderColor = selectedR === k ? info.color : '';
-    b.onclick = () => selectRegion(k);
-    wrap.appendChild(b);
-  });
-}
-
-function renderEmailGrid(d, filterR) {
-  const grid = document.getElementById('emailGrid');
-  grid.innerHTML = '';
-  let emails = [...(d.emails || [])].sort((a,b) => b.datetime.localeCompare(a.datetime));
-  if (filterR && filterR !== 'all') emails = emails.filter(e => e.region === filterR);
-  emails.forEach(e => {
-    const ri = REGION_INFO[e.region] || {name:'기타', color:'#6B7280'};
-    const ti = TYPE_INFO[e.type] || {name:'기타', color:'#6B7280'};
-    const nl = e.newsletter === 'Y' ? '✉ NL' : '';
-    grid.innerHTML += `<div class="email-card">
-      <div class="ec-header">
-        <span class="badge" style="background:${ri.color}">${e.country || ri.name}</span>
-        <span class="badge" style="background:${ti.color}">${ti.name}</span>
-        ${nl ? `<span class="badge" style="background:#e42526">${nl}</span>` : ''}
-      </div>
-      <div class="ec-name">${e.name}</div>
-      <div class="ec-date">${e.datetime}</div>
-      <div class="ec-summary">${e.summary}</div>
-      <div class="ec-meta">${e.email || ''} ${e.phone ? '· ' + e.phone : ''}</div>
-      <div class="ec-action"><span class="badge" style="background:#f1f5f9;color:#0f172a;font-weight:500">${e.action}</span></div>
+// ── 지역 그리드 ──────────────────────────────────────────────────────────────
+function renderRegionGrid(d, filteredEmails) {
+  const html = Object.entries(REGION_META).map(([k, v]) => {
+    const cnt = d.emails.filter(e => e.region === k).length;
+    const nlY = d.regionNL[k] || 0;
+    const isActive = currentRegion === k ? ' active' : '';
+    return `<div class="region-card${isActive}" onclick="toggleRegion('${k}')">
+      <div class="r-label"><span class="region-dot" style="background:${v.color}"></span>${v.name}</div>
+      <div class="r-count" style="color:${v.color}">${cnt}</div>
+      <div class="r-nl">NL동의 ${nlY}건</div>
     </div>`;
-  });
-  if (emails.length === 0) grid.innerHTML = '<div style="padding:20px;color:var(--sub);text-align:center;">해당 지역 문의 없음</div>';
+  }).join('');
+  document.getElementById('regionGrid').innerHTML = html;
 }
 
-function renderTableFilterBtns(d) {
-  const wrap = document.getElementById('tableFilterBtns');
-  wrap.innerHTML = '';
-  wrap.style.display = 'flex'; wrap.style.gap = '6px'; wrap.style.flexWrap = 'wrap';
-  const allBtn = document.createElement('button');
-  allBtn.className = 'tab-btn tbl-filter-btn active'; allBtn.textContent = '전체'; allBtn.dataset.region = 'all';
-  allBtn.onclick = () => { tableFilterRegion = 'all'; renderTable(d, 'all'); document.querySelectorAll('.tbl-filter-btn').forEach(b => b.classList.toggle('active', b.dataset.region === 'all')); };
-  wrap.appendChild(allBtn);
-  Object.entries(REGION_INFO).forEach(([k, info]) => {
-    const cnt = (d.regionCounts || {})[k] || 0;
-    if (!cnt) return;
-    const b = document.createElement('button');
-    b.className = 'tab-btn tbl-filter-btn'; b.textContent = `${info.name}`; b.dataset.region = k;
-    b.onclick = () => { tableFilterRegion = k; renderTable(d, k); document.querySelectorAll('.tbl-filter-btn').forEach(x => x.classList.toggle('active', x.dataset.region === k)); };
-    wrap.appendChild(b);
-  });
+// ── 이메일 카드 ─────────────────────────────────────────────────────────────
+function renderEmailCards(emails) {
+  if (emails.length === 0) {
+    document.getElementById('emailGrid').innerHTML = '<p style="color:var(--sub);font-size:13px">해당 조건의 문의가 없습니다.</p>';
+    return;
+  }
+  const html = emails.map(e => {
+    const rm = REGION_META[e.region];
+    const tm = TYPE_META[e.type];
+    const nlCls = e.newsletter === 'Y' ? 'nl-y' : e.newsletter === 'N' ? 'nl-n' : 'nl-blank';
+    const nlTxt = e.newsletter === 'Y' ? 'NL동의' : e.newsletter === 'N' ? 'NL미동의' : 'NL미표기';
+    return `<div class="email-card">
+      <div class="email-card-top">
+        <div>
+          <div class="email-name">${e.name}
+            <span class="nl-badge ${nlCls}">${nlTxt}</span>
+          </div>
+          <div class="email-dt">${e.datetime}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <span class="badge badge-region" style="background:${rm.color}">${rm.name}</span><br>
+          <span class="badge badge-type" style="background:${tm.color}20;color:${tm.color};margin-top:3px">${tm.name}</span>
+        </div>
+      </div>
+      <div class="email-summary">${e.summary}</div>
+      <div class="email-meta">🌍 ${e.country} &nbsp;|&nbsp; ✉️ ${e.email}</div>
+      <div><span class="action-badge">⚡ ${e.action}</span></div>
+    </div>`;
+  }).join('');
+  document.getElementById('emailGrid').innerHTML = html;
 }
 
-function resetFilter() {
-  tableFilterRegion = 'all';
-  const d = ALL_MONTHLY_DATA[currentYM];
-  renderTable(d, 'all');
-  document.querySelectorAll('.tbl-filter-btn').forEach(b => b.classList.toggle('active', b.dataset.region === 'all'));
-}
-
-function renderTable(d, filterR) {
-  const tbody = document.getElementById('tableBody');
-  let emails = [...(d.emails || [])].sort((a,b) => b.datetime.localeCompare(a.datetime));
-  if (filterR && filterR !== 'all') emails = emails.filter(e => e.region === filterR);
-  tbody.innerHTML = emails.map(e => {
-    const ri = REGION_INFO[e.region] || {name:'기타', color:'#6B7280'};
-    const ti = TYPE_INFO[e.type] || {name:'기타', color:'#6B7280'};
+// ── 테이블 ───────────────────────────────────────────────────────────────────
+function renderTable(emails) {
+  const rows = emails.map(e => {
+    const rm = REGION_META[e.region];
+    const tm = TYPE_META[e.type];
+    const nlCls = e.newsletter === 'Y' ? 'nl-y' : e.newsletter === 'N' ? 'nl-n' : 'nl-blank';
     return `<tr>
       <td>${e.datetime}</td>
-      <td><span class="badge" style="background:${ri.color}">${ri.name}</span></td>
-      <td>${e.country || ''}</td>
-      <td>${e.name || ''}</td>
-      <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.email || ''}</td>
-      <td><span class="badge" style="background:${ti.color}">${ti.name}</span></td>
-      <td style="text-align:center">${e.newsletter === 'Y' ? '✅' : e.newsletter === 'N' ? '❌' : '-'}</td>
-      <td style="max-width:200px">${e.summary || ''}</td>
-      <td style="font-size:11px;color:var(--sub)">${e.action || ''}</td>
+      <td><span class="badge badge-region" style="background:${rm.color}">${e.country}</span></td>
+      <td>${e.name}</td>
+      <td style="font-size:11px">${e.email}</td>
+      <td style="font-size:11px">${e.phone}</td>
+      <td><span class="badge" style="background:${tm.color}20;color:${tm.color}">${tm.name}</span></td>
+      <td><span class="nl-badge ${nlCls}">${e.newsletter}</span></td>
+      <td style="max-width:280px;line-height:1.4">${e.summary}</td>
+      <td style="font-size:11px;color:#92400e">${e.action}</td>
     </tr>`;
   }).join('');
+  document.getElementById('tableBody').innerHTML = rows;
 }
 
-initNav();
+// ── 지역 필터 ────────────────────────────────────────────────────────────────
+function toggleRegion(region) {
+  if (currentRegion === region) selectRegion('all');
+  else selectRegion(region);
+}
+function selectRegion(region) {
+  currentRegion = region;
+  const d = ALL_MONTHLY_DATA[currentMonth];
+  if (!d) return;
+  document.querySelectorAll('.region-card').forEach((c, i) => {
+    const r = Object.keys(REGION_META)[i];
+    c.classList.toggle('active', r === region);
+  });
+  document.getElementById('filterLabel').textContent =
+    region === 'all' ? '' : '— ' + REGION_META[region].name + ' 필터';
+  renderMonthUI();
+}
+
+// ── 초기화 ───────────────────────────────────────────────────────────────────
+(function init() {
+  buildNav();
+  const months = Object.keys(ALL_MONTHLY_DATA).sort();
+  const latest = months[months.length - 1];
+  loadMonth(latest);
+  const year = latest.split('-')[0];
+  const ytab = document.getElementById('ytab-' + year);
+  if (ytab) ytab.classList.add('active');
+})();
 </script>
 </body>
 </html>
