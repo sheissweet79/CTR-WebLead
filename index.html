@@ -23,7 +23,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .btn{padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:.8rem;transition:.15s}
 .btn:hover{background:var(--border)}
 .container{max-width:1400px;margin:0 auto;padding:20px 16px}
-/* Month Nav */
 .nav-wrap{background:var(--card);border-radius:12px;padding:16px;margin-bottom:20px;border:1px solid var(--border)}
 .year-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
 .year-tab{padding:5px 14px;border-radius:20px;border:1px solid var(--border);cursor:pointer;font-size:.82rem;background:var(--card);color:var(--sub);transition:.15s}
@@ -32,26 +31,21 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .mo-btn{padding:5px 12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;font-size:.8rem;background:var(--card);color:var(--sub);transition:.15s}
 .mo-btn:hover{border-color:var(--accent);color:var(--accent)}
 .mo-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-/* Grid 3col */
 .grid3{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:16px;margin-bottom:20px}
 @media(max-width:900px){.grid3{grid-template-columns:1fr}}
 .card{background:var(--card);border-radius:12px;padding:18px;border:1px solid var(--border)}
 .card h3{font-size:.85rem;color:var(--sub);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
 .kpi-val{font-size:2.4rem;font-weight:800;color:var(--accent);line-height:1}
 .kpi-sub{font-size:.78rem;color:var(--sub);margin-top:4px}
-/* progress bar */
 .prog-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
 .prog-label{font-size:.78rem;width:70px;flex-shrink:0;color:var(--sub)}
 .prog-bar-wrap{flex:1;background:var(--border);border-radius:4px;height:8px;overflow:hidden}
 .prog-bar{height:100%;border-radius:4px;transition:width .4s}
 .prog-count{font-size:.78rem;width:28px;text-align:right;color:var(--text)}
-/* Chart */
 .chart-wrap{position:relative;height:220px}
-/* Trend */
 .trend-card{background:var(--card);border-radius:12px;padding:18px;border:1px solid var(--border);margin-bottom:20px}
 .trend-card h3{font-size:.85rem;color:var(--sub);margin-bottom:14px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
 .trend-chart-wrap{position:relative;height:200px}
-/* Region KPI grid */
 .region-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
 @media(max-width:700px){.region-grid{grid-template-columns:repeat(2,1fr)}}
 .reg-card{background:var(--card);border-radius:12px;padding:14px;border:2px solid var(--border);cursor:pointer;transition:.15s}
@@ -60,7 +54,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .reg-card .reg-name{font-size:.75rem;color:var(--sub);font-weight:600;text-transform:uppercase;margin-bottom:4px}
 .reg-card .reg-count{font-size:1.6rem;font-weight:800;line-height:1}
 .reg-card .reg-nl{font-size:.72rem;color:var(--sub);margin-top:3px}
-/* Email cards */
 .region-panel{background:var(--card);border-radius:12px;padding:18px;border:1px solid var(--border);margin-bottom:20px}
 .region-panel h3{font-size:.85rem;color:var(--sub);margin-bottom:14px;font-weight:600}
 .email-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
@@ -71,7 +64,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .ecard-date{font-size:.72rem;color:var(--sub)}
 .ecard-summary{font-size:.78rem;color:var(--sub);line-height:1.5;margin-top:4px}
 .action-badge{display:inline-block;margin-top:6px;padding:3px 8px;background:rgba(228,37,38,.12);color:var(--accent);border-radius:6px;font-size:.7rem;font-weight:600}
-/* Table */
 .table-section{background:var(--card);border-radius:12px;padding:18px;border:1px solid var(--border);margin-bottom:20px}
 .table-section h3{font-size:.85rem;color:var(--sub);margin-bottom:14px;font-weight:600}
 .filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
@@ -87,23 +79,19 @@ tr:last-child td{border-bottom:none}
 <body>
 <div class="header">
   <div>
-    <h1>🚗 CTR Aftermarket Website 고객 문의 보고서</h1>
+    <h1>&#x1F697; CTR Aftermarket Website 고객 문의 보고서</h1>
     <div class="header-sub" id="lastUpdate">마지막 업데이트: —</div>
   </div>
   <div class="header-right">
-    <button class="btn" onclick="toggleDark()">🌙 다크모드</button>
-    <button class="btn" onclick="window.print()">🖨️ 인쇄</button>
+    <button class="btn" onclick="toggleDark()">&#x1F319; 다크모드</button>
+    <button class="btn" onclick="window.print()">&#x1F5A8;&#xFE0F; 인쇄</button>
   </div>
 </div>
-
 <div class="container">
-  <!-- Month Nav -->
   <div class="nav-wrap">
     <div class="year-tabs" id="yearTabs"></div>
     <div class="month-btns" id="monthBtns"></div>
   </div>
-
-  <!-- KPI + Charts -->
   <div class="grid3">
     <div>
       <div class="card" style="margin-bottom:14px">
@@ -132,25 +120,17 @@ tr:last-child td{border-bottom:none}
       </div>
     </div>
   </div>
-
-  <!-- Trend -->
   <div class="trend-card">
-    <h3>📈 월별 문의 추이</h3>
+    <h3>&#x1F4C8; 월별 문의 추이</h3>
     <div class="trend-chart-wrap"><canvas id="trendChart"></canvas></div>
   </div>
-
-  <!-- Region KPI -->
   <div class="region-grid" id="regionGrid"></div>
-
-  <!-- Email Cards -->
   <div class="region-panel">
-    <h3 id="panelTitle">📋 문의 상세 카드</h3>
+    <h3 id="panelTitle">&#x1F4CB; 문의 상세 카드</h3>
     <div class="email-cards" id="emailCards"></div>
   </div>
-
-  <!-- Table -->
   <div class="table-section">
-    <h3>📊 상세 데이터 테이블</h3>
+    <h3>&#x1F4CA; 상세 데이터 테이블</h3>
     <div class="filter-row">
       <select id="tblRegionFilter" onchange="renderTable()">
         <option value="all">전체 지역</option>
@@ -186,7 +166,6 @@ tr:last-child td{border-bottom:none}
     </div>
   </div>
 </div>
-
 <div class="footer">© 2025 CTR Co., Ltd. — 자동 생성 보고서</div>
 
 <script>
@@ -237,7 +216,6 @@ function selectYear(year){
     b.onclick=()=>loadMonth(m);
     mbEl.appendChild(b);
   });
-  // trend
   renderTrendChart(year);
 }
 
@@ -247,7 +225,6 @@ function loadMonth(ym){
   document.querySelectorAll('.mo-btn').forEach(b=>b.classList.toggle('active',b.dataset.month===ym));
   const mo=ALL_MONTHLY_DATA[ym];
   if(!mo)return;
-  // KPIs
   document.getElementById('kpiTotal').textContent=mo.total;
   document.getElementById('kpiSub').textContent=mo.label+' 누적';
   document.getElementById('kpiNL').textContent=mo.nlY;
@@ -297,7 +274,11 @@ function renderTypeProgress(mo, region){
   el.innerHTML=types.map(t=>{
     const c=counts[t]||0;
     const pct=Math.round(c/total*100);
-    return '<div class="prog-row"><div class="prog-label">'+TYPE_LABELS[t]+'</div><div class="prog-bar-wrap"><div class="prog-bar" style="width:'+pct+'%;background:'+TYPE_COLORS[t]+'"></div></div><div class="prog-count">'+c+'</div></div>';
+    return `<div class="prog-row">
+      <div class="prog-label">${TYPE_LABELS[t]}</div>
+      <div class="prog-bar-wrap"><div class="prog-bar" style="width:${pct}%;background:${TYPE_COLORS[t]}"></div></div>
+      <div class="prog-count">${c}</div>
+    </div>`;
   }).join('');
 }
 
@@ -306,7 +287,11 @@ function renderRegionGrid(mo){
   document.getElementById('regionGrid').innerHTML=regions.map(r=>{
     const cnt=mo.regionCounts[r]||0;
     const nl=mo.regionNL[r]||0;
-    return '<div class="reg-card'+(currentRegion===r?' selected':'')+'" onclick="toggleRegion(''+r+'')" data-region="'+r+'" style="border-color:'+(currentRegion===r?REGION_COLORS[r]:'')+';color:'+(currentRegion===r?REGION_COLORS[r]:'')+'"><div class="reg-name">'+REGION_LABELS[r]+'</div><div class="reg-count" style="color:'+REGION_COLORS[r]+'">'+cnt+'</div><div class="reg-nl">NL동의 '+nl+'건</div></div>';
+    return `<div class="reg-card${currentRegion===r?' selected':''}" onclick="toggleRegion('${r}')" data-region="${r}" style="border-color:${currentRegion===r?REGION_COLORS[r]:''};color:${currentRegion===r?REGION_COLORS[r]:''}">
+      <div class="reg-name">${REGION_LABELS[r]}</div>
+      <div class="reg-count" style="color:${REGION_COLORS[r]}">${cnt}</div>
+      <div class="reg-nl">NL동의 ${nl}건</div>
+    </div>`;
   }).join('');
 }
 
@@ -333,7 +318,19 @@ function selectRegion(r){
 function renderEmailCards(mo,region){
   const emails=region==='all'?mo.emails:mo.emails.filter(e=>e.region===region);
   const sorted=[...emails].sort((a,b)=>b.datetime.localeCompare(a.datetime));
-  document.getElementById('emailCards').innerHTML=sorted.map(e=>'<div class="ecard"><div class="ecard-top"><span class="badge" style="background:'+REGION_COLORS[e.region]+'">'+REGION_LABELS[e.region]+'</span><span class="badge" style="background:'+TYPE_COLORS[e.type]+'">'+TYPE_LABELS[e.type]+'</span>'+(e.newsletter==='Y'?'<span class="badge" style="background:#0891B2">NL</span>':'')+'</div><div class="ecard-name">'+esc(e.name)+' <span style="font-size:.75rem;color:var(--sub)">('+esc(e.country)+')</span></div><div class="ecard-date">'+esc(e.datetime)+'</div><div class="ecard-summary">'+esc(e.summary)+'</div><div class="action-badge">'+esc(e.action)+'</div></div>').join('');
+  document.getElementById('emailCards').innerHTML=sorted.map(e=>`
+    <div class="ecard">
+      <div class="ecard-top">
+        <span class="badge" style="background:${REGION_COLORS[e.region]}">${REGION_LABELS[e.region]}</span>
+        <span class="badge" style="background:${TYPE_COLORS[e.type]}">${TYPE_LABELS[e.type]}</span>
+        ${e.newsletter==='Y'?'<span class="badge" style="background:#0891B2">NL</span>':''}
+      </div>
+      <div class="ecard-name">${esc(e.name)} <span style="font-size:.75rem;color:var(--sub)">(${esc(e.country)})</span></div>
+      <div class="ecard-date">${esc(e.datetime)}</div>
+      <div class="ecard-summary">${esc(e.summary)}</div>
+      <div class="action-badge">${esc(e.action)}</div>
+    </div>
+  `).join('');
 }
 
 function renderTable(){
@@ -345,7 +342,17 @@ function renderTable(){
   if(currentRegion!=='all')emails=emails.filter(e=>e.region===currentRegion);
   if(rf!=='all')emails=emails.filter(e=>e.region===rf);
   if(tf!=='all')emails=emails.filter(e=>e.type===tf);
-  document.getElementById('tblBody').innerHTML=emails.map(e=>'<tr><td style="white-space:nowrap">'+esc(e.datetime)+'</td><td><span style="color:'+REGION_COLORS[e.region]+';font-weight:600">'+esc(e.country)+'</span></td><td>'+esc(e.name)+'</td><td style="font-size:.73rem">'+esc(e.email)+'</td><td style="font-size:.73rem;white-space:nowrap">'+esc(e.phone)+'</td><td><span class="badge" style="background:'+TYPE_COLORS[e.type]+'">'+TYPE_LABELS[e.type]+'</span></td><td style="text-align:center">'+(e.newsletter==='Y'?'<span style="color:#0891B2;font-weight:700">Y</span>':e.newsletter)+'</td><td style="font-size:.75rem;max-width:240px">'+esc(e.summary)+'</td><td style="font-size:.73rem;color:var(--accent)">'+esc(e.action)+'</td></tr>').join('');
+  document.getElementById('tblBody').innerHTML=emails.map(e=>`<tr>
+    <td style="white-space:nowrap">${esc(e.datetime)}</td>
+    <td><span style="color:${REGION_COLORS[e.region]};font-weight:600">${esc(e.country)}</span></td>
+    <td>${esc(e.name)}</td>
+    <td style="font-size:.73rem">${esc(e.email)}</td>
+    <td style="font-size:.73rem;white-space:nowrap">${esc(e.phone)}</td>
+    <td><span class="badge" style="background:${TYPE_COLORS[e.type]}">${TYPE_LABELS[e.type]}</span></td>
+    <td style="text-align:center">${e.newsletter==='Y'?'<span style="color:#0891B2;font-weight:700">Y</span>':e.newsletter}</td>
+    <td style="font-size:.75rem;max-width:240px">${esc(e.summary)}</td>
+    <td style="font-size:.73rem;color:var(--accent)">${esc(e.action)}</td>
+  </tr>`).join('');
 }
 
 function renderTrendChart(year){
@@ -384,6 +391,7 @@ function toggleDark(){
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 init();
+
 </script>
 </body>
 </html>
