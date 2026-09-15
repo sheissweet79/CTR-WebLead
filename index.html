@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>CTR Aftermarket Website 고객 문의 보고서</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{
   --bg:#f8fafc;--card:#ffffff;--text:#0f172a;--sub:#64748b;
@@ -80,7 +81,7 @@ tr:last-child td{border-bottom:none}
 <div class="header">
   <div>
     <h1>&#x1F697; CTR Aftermarket Website 고객 문의 보고서</h1>
-    <div class="header-sub" id="lastUpdate">마지막 업데이트: 2026-09-15 09:00 (KST)</div>
+    <div class="header-sub" id="lastUpdate">마지막 업데이트: 2026-09-15 10:50 (KST)</div>
   </div>
   <div class="header-right">
     <button class="btn" onclick="toggleDark()">🌙 다크모드</button>
@@ -90,6 +91,7 @@ tr:last-child td{border-bottom:none}
   <div class="nav-wrap">
     <div class="year-tabs" id="yearTabs"></div>
     <div class="month-btns" id="monthBtns"></div>
+    <div style="font-size:.72rem;color:var(--sub);margin-top:6px">월 버튼을 다시 클릭하면 선택 해제(전체 연도로 표시)되고, Ctrl(Mac은 ⌘)을 누른 채 클릭하면 여러 달을 동시에 선택할 수 있습니다.</div>
   </div>
   <div class="grid3">
     <div class="card">
@@ -147,6 +149,7 @@ tr:last-child td{border-bottom:none}
         <option value="other">기타</option>
       </select>
       <button class="btn" onclick="resetFilters()">필터 초기화</button>
+      <button class="btn" onclick="exportExcel()">⬇ 엑셀 다운로드</button>
     </div>
     <div class="tbl-wrap">
       <table>
@@ -171,14 +174,12 @@ const REGION_COLORS={na:'#2563EB',latam:'#DC2626',eu:'#EA580C',sea:'#16A34A',af:
 const TYPE_LABELS={parts:'부품 정보',purchase:'구매/주문',price:'가격/견적',technical:'기술 지원',complaint:'불만/A·S',empty:'내용 없음',other:'기타'};
 const TYPE_COLORS={parts:'#0EA5E9',purchase:'#10B981',price:'#F59E0B',technical:'#8B5CF6',complaint:'#EF4444',empty:'#9CA3AF',other:'#6B7280'};
 
-let currentMonth='', currentRegion='all';
+let currentYear='', currentMonths=[], currentRegion='all';
+let currentAggMo=null;
 let barChartInst=null, donutChartInst=null, trendChartInst=null;
 
 function init(){
-  document.getElementById('lastUpdate').textContent='마지막 업데이트: 2026-08-12 08:35 (KST)';
   buildNav();
-  const months=Object.keys(ALL_MONTHLY_DATA).sort();
-  loadMonth(months[months.length-1]);
 }
 
 function buildNav(){
@@ -193,31 +194,98 @@ function buildNav(){
     b.dataset.year=y;
     ytEl.appendChild(b);
   });
+  currentMonths=months.length?[months[months.length-1]]:[];
   selectYear(years[years.length-1]);
 }
 
 function selectYear(year){
+  currentYear=year;
+  currentMonths=currentMonths.filter(m=>m.startsWith(year));
   document.querySelectorAll('.year-tab').forEach(b=>b.classList.toggle('active',b.dataset.year===year));
   const months=Object.keys(ALL_MONTHLY_DATA).filter(m=>m.startsWith(year)).sort();
   const mbEl=document.getElementById('monthBtns');
   mbEl.innerHTML='';
   months.forEach(m=>{
     const b=document.createElement('button');
-    b.className='mo-btn'+(m===currentMonth?' active':'');
+    b.className='mo-btn'+(currentMonths.includes(m)?' active':'');
     b.textContent=m.split('-')[1]+'월';
     b.dataset.month=m;
-    b.onclick=()=>loadMonth(m);
+    b.onclick=(ev)=>toggleMonth(m,ev);
     mbEl.appendChild(b);
   });
   renderTrendChart(year);
+  renderView();
 }
 
-function loadMonth(ym){
-  currentMonth=ym;
+function toggleMonth(m, ev){
+  const isMulti = ev && (ev.ctrlKey || ev.metaKey);
+  if(isMulti){
+    const idx=currentMonths.indexOf(m);
+    if(idx>=0){ currentMonths.splice(idx,1); } else { currentMonths.push(m); }
+  } else {
+    currentMonths=(currentMonths.length===1 && currentMonths[0]===m) ? [] : [m];
+  }
+  document.querySelectorAll('.mo-btn').forEach(b=>b.classList.toggle('active',currentMonths.includes(b.dataset.month)));
+  renderTrendChart(currentYear);
+  renderView();
+}
+
+function selectSingleMonth(m){
+  currentMonths=[m];
+  document.querySelectorAll('.mo-btn').forEach(b=>b.classList.toggle('active',b.dataset.month===m));
+  renderTrendChart(currentYear);
+  renderView();
+}
+
+function getSelectedMonths(){
+  const yearMonths=Object.keys(ALL_MONTHLY_DATA).filter(m=>m.startsWith(currentYear)).sort();
+  if(currentMonths.length>0) return yearMonths.filter(m=>currentMonths.includes(m));
+  return yearMonths;
+}
+
+function aggregateMonths(monthKeys){
+  if(monthKeys.length===1) return ALL_MONTHLY_DATA[monthKeys[0]];
+  const REGIONS=Object.keys(REGION_LABELS);
+  const TYPES=['purchase','parts','price','technical','complaint','empty','other'];
+  const agg={label:'',total:0,nlY:0,
+    typeCounts:Object.fromEntries(TYPES.map(t=>[t,0])),
+    regionCounts:Object.fromEntries(REGIONS.map(r=>[r,0])),
+    regionNL:Object.fromEntries(REGIONS.map(r=>[r,0])),
+    regionNL_N:Object.fromEntries(REGIONS.map(r=>[r,0])),
+    regionNL_Blank:Object.fromEntries(REGIONS.map(r=>[r,0])),
+    regionTypeCounts:Object.fromEntries(REGIONS.map(r=>[r,Object.fromEntries(TYPES.map(t=>[t,0]))])),
+    emails:[]
+  };
+  monthKeys.forEach(k=>{
+    const mo=ALL_MONTHLY_DATA[k];
+    if(!mo)return;
+    agg.total+=mo.total||0;
+    agg.nlY+=mo.nlY||0;
+    TYPES.forEach(t=>agg.typeCounts[t]+=(mo.typeCounts&&mo.typeCounts[t])||0);
+    REGIONS.forEach(r=>{
+      agg.regionCounts[r]+=(mo.regionCounts&&mo.regionCounts[r])||0;
+      agg.regionNL[r]+=(mo.regionNL&&mo.regionNL[r])||0;
+      agg.regionNL_N[r]+=(mo.regionNL_N&&mo.regionNL_N[r])||0;
+      agg.regionNL_Blank[r]+=(mo.regionNL_Blank&&mo.regionNL_Blank[r])||0;
+      TYPES.forEach(t=>{
+        agg.regionTypeCounts[r][t]+=(mo.regionTypeCounts&&mo.regionTypeCounts[r]&&mo.regionTypeCounts[r][t])||0;
+      });
+    });
+    agg.emails=agg.emails.concat(mo.emails||[]);
+  });
+  const yearMonthsCount=Object.keys(ALL_MONTHLY_DATA).filter(m=>m.startsWith(currentYear)).length;
+  agg.label=(monthKeys.length===yearMonthsCount)
+    ? currentYear+'년 전체'
+    : monthKeys.map(k=>ALL_MONTHLY_DATA[k].label).join(', ');
+  return agg;
+}
+
+function renderView(){
+  const monthKeys=getSelectedMonths();
   currentRegion='all';
-  document.querySelectorAll('.mo-btn').forEach(b=>b.classList.toggle('active',b.dataset.month===ym));
-  const mo=ALL_MONTHLY_DATA[ym];
-  if(!mo)return;
+  if(monthKeys.length===0){ currentAggMo=null; return; }
+  const mo=aggregateMonths(monthKeys);
+  currentAggMo=mo;
   document.getElementById('kpiTotal').textContent=mo.total;
   document.getElementById('kpiSub').textContent=mo.label+' 누적';
   document.getElementById('kpiNL').textContent=mo.nlY;
@@ -294,7 +362,7 @@ function toggleRegion(r){
 }
 function selectRegion(r){
   currentRegion=r;
-  const mo=ALL_MONTHLY_DATA[currentMonth];
+  const mo=currentAggMo;
   document.querySelectorAll('.reg-card').forEach(c=>{
     const cr=c.dataset.region;
     c.classList.toggle('selected',cr===r);
@@ -326,15 +394,20 @@ function renderEmailCards(mo,region){
   `).join('');
 }
 
-function renderTable(){
-  const mo=ALL_MONTHLY_DATA[currentMonth];
-  if(!mo)return;
+function getFilteredEmails(){
+  const mo=currentAggMo;
+  if(!mo)return[];
   const rf=document.getElementById('tblRegionFilter').value;
   const tf=document.getElementById('tblTypeFilter').value;
   let emails=[...mo.emails].sort((a,b)=>b.datetime.localeCompare(a.datetime));
   if(currentRegion!=='all')emails=emails.filter(e=>e.region===currentRegion);
   if(rf!=='all')emails=emails.filter(e=>e.region===rf);
   if(tf!=='all')emails=emails.filter(e=>e.type===tf);
+  return emails;
+}
+
+function renderTable(){
+  const emails=getFilteredEmails();
   document.getElementById('tblBody').innerHTML=emails.map(e=>`<tr>
     <td style="white-space:nowrap">${esc(e.datetime)}</td>
     <td><span style="color:${REGION_COLORS[e.region]};font-weight:600">${esc(e.country)}</span></td>
@@ -348,13 +421,37 @@ function renderTable(){
   </tr>`).join('');
 }
 
+function exportExcel(){
+  const emails=getFilteredEmails();
+  if(!emails.length){ alert('내보낼 데이터가 없습니다.'); return; }
+  const rows=emails.map(e=>({
+    '수신일시(KST)':e.datetime,
+    '지역':REGION_LABELS[e.region]||e.region,
+    '국가':e.country,
+    '이름':e.name,
+    '이메일':e.email,
+    '전화번호':e.phone,
+    '유형':TYPE_LABELS[e.type]||e.type,
+    '뉴스레터':e.newsletter,
+    '문의요약':e.summary,
+    '권고사항':e.action
+  }));
+  const ws=XLSX.utils.json_to_sheet(rows);
+  ws['!cols']=[{wch:16},{wch:8},{wch:16},{wch:16},{wch:26},{wch:16},{wch:12},{wch:8},{wch:55},{wch:22}];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '상세내역');
+  const label=(currentAggMo&&currentAggMo.label)?currentAggMo.label:currentYear;
+  const fname='CTR_문의내역_'+String(label).replace(/[,\s]+/g,'_')+'.xlsx';
+  XLSX.writeFile(wb, fname);
+}
+
 function renderTrendChart(year){
   const ctx=document.getElementById('trendChart').getContext('2d');
   if(trendChartInst)trendChartInst.destroy();
   const months=Object.keys(ALL_MONTHLY_DATA).filter(m=>m.startsWith(year)).sort();
   const labels=months.map(m=>m.split('-')[1]+'월');
   const totals=months.map(m=>ALL_MONTHLY_DATA[m].total);
-  const pointColors=months.map(m=>m===currentMonth?'#e42526':'#1e40af');
+  const pointColors=months.map(m=>currentMonths.includes(m)?'#e42526':'#1e40af');
   trendChartInst=new Chart(ctx,{
     type:'line',
     data:{labels,datasets:[{
@@ -365,7 +462,7 @@ function renderTrendChart(year){
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{display:false}},
       scales:{y:{beginAtZero:true,ticks:{stepSize:5},grid:{color:'rgba(128,128,128,.1)'}},x:{grid:{display:false}}},
-      onClick:(_,el)=>{if(el.length)loadMonth(months[el[0].index])}}
+      onClick:(_,el)=>{if(el.length)selectSingleMonth(months[el[0].index])}}
   });
 }
 
